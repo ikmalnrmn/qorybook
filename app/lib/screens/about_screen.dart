@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../state/app_state.dart';
 import '../theme.dart';
+import '../widgets/disclaimer.dart';
 
 /// Tentang aplikasi, sumber buku, dan pengelolaan penyimpanan.
 class AboutScreen extends StatefulWidget {
@@ -65,6 +66,8 @@ class _AboutScreenState extends State<AboutScreen> {
               ],
             ),
           ),
+          const SizedBox(height: 16),
+          const DisclaimerCard(),
           const SizedBox(height: 20),
           Text('Sumber buku', style: text.titleMedium),
           const SizedBox(height: 8),
@@ -80,8 +83,8 @@ class _AboutScreenState extends State<AboutScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Qorybook tidak menyimpan atau mengubah isi buku. Setiap buku diambil langsung dari server '
-            'pemerintah saat dibuka, dan hak cipta tetap milik penulis, ilustrator, serta penerbitnya.',
+            'Setiap buku diambil langsung dari server pemerintah saat dibuka; Qorybook tidak menyalin '
+            'atau menerbitkan ulang berkasnya.',
             style: text.bodyMedium?.copyWith(color: QColors.inkSoft),
           ),
           if (catalog != null) ...[

@@ -5,6 +5,7 @@ import '../services/parent_auth.dart';
 import '../state/app_state.dart';
 import '../state/kid_mode.dart';
 import '../theme.dart';
+import '../widgets/disclaimer.dart';
 import '../widgets/kid_mode_checklist.dart';
 import '../widgets/pin_pad.dart';
 import '../widgets/profile_form.dart';
@@ -207,13 +208,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return _stepScaffold(
       emoji: '📚',
       title: 'Selamat datang di Qorybook',
-      subtitle: 'Perpustakaan buku anak gratis dari Kemendikdasmen, aman di bawah pengawasan orang tua.',
+      subtitle: 'Cara mudah dan menyenangkan membaca buku anak resmi dari pemerintah, dengan pengawasan orang tua.',
       body: Column(
         children: [
           point('🏛️', 'Buku resmi & gratis', 'Lebih dari 1.400 buku bacaan PAUD–SD dari SIBI dan BUDI.'),
           point('📌', 'Anak tetap di aplikasi', 'Layar disematkan; keluar hanya dengan PIN orang tua atau kunci HP.'),
           point('🔕', 'Tanpa gangguan', 'Notifikasi disenyapkan selama anak membaca.'),
           point('👧', 'Profil tiap anak', 'Jenjang buku, progres, dan rak buku masing-masing.'),
+          const SizedBox(height: 6),
+          const DisclaimerCard(),
         ],
       ),
       bottom: FilledButton(onPressed: _next, child: const Text('Atur sekarang')),

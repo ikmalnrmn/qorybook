@@ -9,6 +9,22 @@ gratis dari pemerintah Indonesia:
 Aplikasi tidak menyimpan file buku. Ia hanya membawa katalog (±1 MB); PDF/audio/video diambil
 langsung dari server pemerintah saat dibuka, lalu disimpan sementara di HP.
 
+## Disclaimer
+
+> **Semua buku di Qorybook adalah buku resmi yang disediakan gratis oleh pemerintah Indonesia**
+> melalui Kementerian Pendidikan Dasar dan Menengah, yaitu SIBI (Pusat Perbukuan) dan BUDI (Badan
+> Pengembangan dan Pembinaan Bahasa).
+>
+> Qorybook hanya menjadi perantara: memudahkan orang tua memilih dan mengawasi bacaan anak, serta
+> memberi pengalaman membaca yang menyenangkan tanpa harus membuka situs aslinya. Qorybook tidak
+> menjual buku dan tidak mengubah isinya.
+>
+> Hak cipta setiap buku tetap milik penulis, ilustrator, dan penerbitnya. Qorybook adalah aplikasi
+> independen dan tidak berafiliasi dengan Kemendikdasmen.
+
+Teks yang sama tampil di aplikasi: layar sambutan, halaman Tentang, dan kartu sumber di setiap buku
+(`app/lib/widgets/disclaimer.dart`).
+
 ## Struktur
 
 | Folder | Isi |
@@ -18,6 +34,10 @@ langsung dari server pemerintah saat dibuka, lalu disimpan sementara di HP.
 | `app/` | Aplikasi Flutter (Android) |
 
 ## Katalog
+
+Katalog terbaru terbit otomatis setiap hari di <https://ikmalnrmn.github.io/qorybook/catalog.json>
+(GitHub Actions → GitHub Pages). Untuk menjalankannya manual: tab **Actions** → **Perbarui katalog** →
+**Run workflow**.
 
 ```bash
 cd catalog
@@ -40,7 +60,7 @@ Penyaringan:
 cd app
 flutter pub get
 flutter run                       # memakai katalog bawaan di assets/catalog.json
-flutter build apk --release --dart-define=CATALOG_URL=https://<akun>.github.io/<repo>/catalog.json
+flutter build apk --release --dart-define=CATALOG_URL=https://ikmalnrmn.github.io/qorybook/catalog.json
 ```
 
 Salin katalog terbaru ke aplikasi sebelum rilis:

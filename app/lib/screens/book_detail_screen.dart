@@ -7,6 +7,7 @@ import '../state/app_state.dart';
 import '../theme.dart';
 import '../widgets/book_card.dart';
 import '../widgets/book_cover.dart';
+import '../widgets/disclaimer.dart';
 import 'media_player_screen.dart';
 import 'reader_screen.dart';
 
@@ -291,7 +292,7 @@ class _SourceCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Buku gratis dari ${book.sourceName}', style: text.titleSmall),
+                Text(Disclaimer.short(book.sourceName), style: text.titleSmall),
                 const SizedBox(height: 2),
                 Text(
                   [

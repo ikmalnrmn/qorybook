@@ -132,7 +132,7 @@ class ParentHome extends StatelessWidget {
                       ),
                       ListTile(
                         leading: const Text('💾', style: TextStyle(fontSize: 24)),
-                        title: const Text('Penyimpanan & sumber buku'),
+                        title: const Text('Tentang Qorybook & sumber buku'),
                         trailing: const Icon(Icons.chevron_right_rounded),
                         onTap: () =>
                             Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const AboutScreen())),

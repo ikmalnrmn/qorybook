@@ -17,6 +17,7 @@ import 'package:qorybook/state/app_state.dart';
 import 'package:qorybook/state/kid_mode.dart';
 import 'package:qorybook/state/screen_time.dart';
 import 'package:qorybook/widgets/book_cover.dart';
+import 'package:qorybook/widgets/disclaimer.dart';
 import 'package:qorybook/widgets/hold_button.dart';
 import 'package:qorybook/widgets/pin_pad.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -207,6 +208,13 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text(book.title), findsWidgets);
       await _shot(tester, '${device.name}_6_detail');
+      await tester.scrollUntilVisible(
+        find.text(Disclaimer.short(book.sourceName)),
+        300,
+        scrollable: find.byType(Scrollable).last,
+      );
+      expect(find.text(Disclaimer.short(book.sourceName)), findsOneWidget);
+      await tester.scrollUntilVisible(find.text(book.title).first, -300, scrollable: find.byType(Scrollable).last);
 
       nav.push(MaterialPageRoute<void>(builder: (_) => ReaderScreen(book: book, initialPage: 0)));
       for (var i = 0; i < 5; i++) {
@@ -235,6 +243,8 @@ void main() {
     testWidgets('pengaturan awal: PIN, profil, lalu Mode Anak (${device.name})', (tester) async {
       final app = await _pumpApp(tester, device, FakeDatabase(), onboarded: false);
       expect(find.text('Selamat datang di Qorybook'), findsOneWidget);
+      expect(find.text(Disclaimer.title), findsOneWidget);
+      expect(find.text(Disclaimer.role), findsOneWidget);
       await _shot(tester, '${device.name}_9_onboarding_1');
 
       await tester.tap(find.text('Atur sekarang'));
