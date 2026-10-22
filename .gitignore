@@ -1,0 +1,6 @@
+catalog/__pycache__/
+catalog/site/
+catalog/dist/
+catalog/dist-build*.log
+catalog/prev.json
+app/test/goldens/
