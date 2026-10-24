@@ -87,18 +87,18 @@ a { color: inherit; }
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); align-items: center;
   gap: clamp(8px, 3vw, 40px); padding-block: clamp(24px, 5vw, 56px) clamp(32px, 5vw, 64px);
 }
-.hero h1 { font-size: var(--step-3); }
+.hero h1 { font-size: clamp(2.2rem, 1.5rem + 2.9vw, 3.9rem); }
 .hero h1 .mark {
-  color: var(--sun); background: linear-gradient(transparent 78%, rgba(255,122,69,.55) 78%, rgba(255,122,69,.55) 94%, transparent 94%);
+  color: var(--night-ink); background: linear-gradient(transparent 78%, rgba(255,122,69,.55) 78%, rgba(255,122,69,.55) 94%, transparent 94%);
 }
-.lead { margin-top: 18px; font-size: var(--step-1); line-height: 1.5; color: var(--night-soft); max-width: 34ch; }
-.lead strong { color: var(--night-ink); font-weight: 800; }
-.pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; padding: 0; list-style: none; }
-.pills li {
-  display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px;
-  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); font-weight: 700; font-size: var(--step--1);
+.hero h1 .num { color: var(--sun); font-variant-numeric: tabular-nums; }
+.lead { margin-top: 18px; font-size: var(--step-1); line-height: 1.55; color: var(--night-soft); max-width: 40ch; }
+.lock-note {
+  width: fit-content; max-width: 100%; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; align-items: center;
+  padding: 10px 18px 10px 10px; border-radius: 18px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
 }
-.pills i { width: 9px; height: 9px; border-radius: 50%; display: block; }
+.lock-note svg { width: 40px; height: 40px; padding: 9px; border-radius: 50%; background: var(--orange); color: #FFFFFF; }
+.lock-note b { display: block; font-weight: 900; color: var(--night-ink); line-height: 1.25; white-space: nowrap; }
 .scene {
   position: relative; height: clamp(440px, 52vw, 640px); min-width: 0; touch-action: pan-y; cursor: grab;
 }
@@ -233,6 +233,58 @@ a { color: inherit; }
 .source .stat b { display: block; font-size: var(--step-2); font-weight: 900; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1.1; }
 .source .stat span { font-weight: 700; color: var(--ink-soft); font-size: var(--step--1); }
 
+/* ---------- unduh ---------- */
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.dl {
+  display: inline-flex; align-items: center; gap: 10px; padding: 15px 24px; border-radius: 18px;
+  background: var(--orange); color: var(--on-orange); font-weight: 900; text-decoration: none;
+  box-shadow: 0 12px 26px -12px rgba(255,122,69,.75); transition: transform .2s ease;
+}
+.dl:hover { transform: translateY(-2px); }
+.dl svg { width: 20px; height: 20px; flex: none; }
+/* label gembok dan tombol unduh selalu sejajar; di layar sangat sempit tombol hanya ikon */
+.hero-cta { display: flex; align-items: stretch; gap: 10px; margin-top: 24px; }
+.hero-cta .lock-note { flex: none; }
+.hero-cta .dl { flex: none; padding-inline: 20px; }
+@media (max-width: 400px) {
+  .hero-cta .lock-note { padding: 8px 14px 8px 8px; gap: 10px; grid-template-columns: 34px minmax(0, 1fr); }
+  .hero-cta .lock-note svg { width: 34px; height: 34px; padding: 8px; }
+  .hero-cta .lock-note b { font-size: 0.95rem; }
+  .hero-cta .dl { padding-inline: 16px; }
+}
+@media (max-width: 340px) {
+  .hero-cta .dl-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .hero-cta .dl { gap: 0; }
+}
+.dl-meta { font-size: var(--step--1); font-weight: 700; color: var(--ink-soft); }
+.hero .dl-meta { color: var(--night-soft); }
+.get-card {
+  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: center; gap: clamp(24px, 5vw, 56px);
+  padding: clamp(22px, 4vw, 44px); border-radius: 28px; background: var(--surface); border: 1px solid var(--line);
+}
+.get-copy { display: grid; gap: 14px; justify-items: start; min-width: 0; }
+.get-copy h2 { font-size: var(--step-2); }
+.get-copy p { color: var(--ink-soft); }
+.steps { list-style: none; counter-reset: step; margin: 0; padding: 0; display: grid; gap: 18px; min-width: 0; }
+.steps li { counter-increment: step; display: grid; grid-template-columns: 44px minmax(0, 1fr); column-gap: 14px; align-items: start; }
+.steps li::before {
+  content: counter(step); grid-row: span 2; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--chip); color: var(--orange-deep); font-weight: 900; font-size: 1.2rem;
+}
+.steps b { font-weight: 900; font-size: var(--step-1); line-height: 1.3; }
+.steps span { color: var(--ink-soft); }
+.mid-cta {
+  margin-top: clamp(56px, 8vw, 96px); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 16px 24px; padding: clamp(20px, 3vw, 28px); border-radius: 24px; background: var(--surface); border: 1px solid var(--line);
+}
+.mid-cta.inline { margin-top: 0; }
+.mid-cta div { display: grid; gap: 4px; min-width: 0; flex: 1 1 280px; }
+.mid-cta b { font-size: var(--step-1); font-weight: 900; line-height: 1.25; }
+.mid-cta span { color: var(--ink-soft); }
+.foot-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
+.foot-links a { font-weight: 800; color: var(--orange-deep); text-decoration: none; }
+.foot-links a:hover { text-decoration: underline; }
+
 /* ---------- developer ---------- */
 .dev { display: grid; gap: clamp(24px, 4vw, 40px); }
 .services { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
@@ -262,7 +314,7 @@ footer p { color: var(--ink-soft); font-size: var(--step--1); max-width: 60ch; }
   .scene { height: 460px; margin-inline: -8px; }
   .facts dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .facts div:first-child { grid-column: 1 / -1; }
-  .spread, .source, .services, .contacts { grid-template-columns: minmax(0, 1fr); }
+  .spread, .source, .services, .contacts, .get-card { grid-template-columns: minmax(0, 1fr); }
   .spread.flip .media { order: 0; }
   .copy { max-width: none; }
 }
@@ -278,6 +330,7 @@ footer p { color: var(--ink-soft); font-size: var(--step--1); max-width: 60ch; }
 
 <header class="hero">
   <div class="wrap">
+    <div class="topbar">
     <div class="brand">
       <svg viewBox="0 0 48 48" aria-hidden="true">
         <circle cx="24" cy="24" r="24" fill="#FF7A45"/>
@@ -288,16 +341,21 @@ footer p { color: var(--ink-soft); font-size: var(--step--1); max-width: 60ch; }
       </svg>
       Qorybook
     </div>
+    </div>
     <div class="hero-grid">
       <div>
-        <p class="eyebrow" style="color: var(--sun)">Aplikasi baca untuk anak · Android</p>
-        <h1 style="margin-top: 14px">Rak buku digital yang <span class="mark">aman</span> untuk anak.</h1>
-        <p class="lead"><strong>1.421 buku cerita resmi dan gratis</strong> dari pemerintah Indonesia, dalam satu aplikasi yang bisa dikunci khusus untuk anak. Orang tua yang pegang kuncinya.</p>
-        <ul class="pills">
-          <li><i style="background: var(--leaf)"></i>Gratis, tanpa iklan</li>
-          <li><i style="background: var(--sky)"></i>PAUD sampai SD kelas 6</li>
-          <li><i style="background: var(--sun)"></i>Buku, komik, audio, video</li>
-        </ul>
+        <h1><span class="num">1.421</span> buku cerita resmi dan <span class="mark">gratis</span> untuk anak.</h1>
+        <p class="lead">Disediakan pemerintah Indonesia, mulai dari buku bergambar dan komik hingga buku audio dan video untuk PAUD sampai SD kelas 6. Tanpa iklan dan tanpa langganan.</p>
+        <div class="hero-cta">
+          <div class="lock-note">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            <b>Bisa dikunci<br>khusus untuk anak</b>
+          </div>
+          <a class="dl" href="https://drive.google.com/file/d/13wMP62IKeAUWDRqTq0lYoUQDHSJKvjwO/view?usp=sharing" target="_blank" rel="noopener" aria-label="Unduh Qorybook">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 19h16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="dl-label">Unduh</span>
+          </a>
+        </div>
       </div>
       <div class="scene" id="scene" aria-label="Animasi 3D: HP berisi aplikasi Qorybook dikelilingi buku-buku yang melayang">
         <div class="fallback">
@@ -371,6 +429,17 @@ footer p { color: var(--ink-soft); font-size: var(--step--1); max-width: 60ch; }
           </div>
         </article>
 
+        <div class="mid-cta inline">
+          <div>
+            <b>Lebih dari 1.400 cerita siap dijelajahi</b>
+            <span>Semuanya gratis di HP Android, tanpa langganan.</span>
+          </div>
+          <a class="dl" href="https://drive.google.com/file/d/13wMP62IKeAUWDRqTq0lYoUQDHSJKvjwO/view?usp=sharing" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 19h16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Unduh Qorybook
+          </a>
+        </div>
+
         <article class="spread">
           <div class="media">
             <div class="stage" data-tilt>
@@ -418,6 +487,17 @@ footer p { color: var(--ink-soft); font-size: var(--step--1); max-width: 60ch; }
             <p>Buku favorit, buku yang sedang dibaca, dan buku yang sudah selesai tersusun rapi di rak masing-masing anak. Kakak dan adik punya raknya sendiri.</p>
           </div>
         </article>
+      </div>
+
+      <div class="mid-cta">
+        <div>
+          <b>Biarkan anak menjelajah sendiri</b>
+          <span>Pasang Qorybook gratis di HP Android. Ukurannya hanya 20,7 MB.</span>
+        </div>
+        <a class="dl" href="https://drive.google.com/file/d/13wMP62IKeAUWDRqTq0lYoUQDHSJKvjwO/view?usp=sharing" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 19h16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Unduh Qorybook
+        </a>
       </div>
     </div>
   </section>
@@ -518,6 +598,17 @@ footer p { color: var(--ink-soft); font-size: var(--step--1); max-width: 60ch; }
           </div>
         </article>
       </div>
+
+      <div class="mid-cta">
+        <div>
+          <b>Siapkan Mode Anak hari ini</b>
+          <span>Cukup buat PIN orang tua dan profil anak. Gratis dan tanpa iklan.</span>
+        </div>
+        <a class="dl" href="https://drive.google.com/file/d/13wMP62IKeAUWDRqTq0lYoUQDHSJKvjwO/view?usp=sharing" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 19h16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Unduh Qorybook
+        </a>
+      </div>
     </div>
   </section>
 
@@ -547,6 +638,28 @@ footer p { color: var(--ink-soft); font-size: var(--step--1); max-width: 60ch; }
     </div>
     <p class="hint hand">geser ke kiri atau kanan</p>
     <div style="height: clamp(40px, 6vw, 72px)"></div>
+  </section>
+
+  <section class="section" id="unduh">
+    <div class="wrap">
+      <div class="get-card">
+        <div class="get-copy">
+          <p class="eyebrow">Unduh gratis</p>
+          <h2>Siap mulai membaca bersama?</h2>
+          <p>Pasang Qorybook di HP Android, buat PIN orang tua, lalu serahkan HP kepada anak dalam Mode Anak.</p>
+          <a class="dl" href="https://drive.google.com/file/d/13wMP62IKeAUWDRqTq0lYoUQDHSJKvjwO/view?usp=sharing" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 19h16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Unduh Qorybook untuk Android
+          </a>
+          <span class="dl-meta">File Qorybook.apk (20,7 MB) di Google Drive · Android 7.0 ke atas</span>
+        </div>
+        <ol class="steps">
+          <li><b>Unduh</b><span>Buka tautan Google Drive, lalu ketuk ikon unduh untuk menyimpan Qorybook.apk.</span></li>
+          <li><b>Pasang</b><span>Buka file yang sudah diunduh. Jika Android bertanya, izinkan pemasangan aplikasi dari sumber tersebut.</span></li>
+          <li><b>Atur</b><span>Buat PIN orang tua dan profil anak, lalu mulai Mode Anak.</span></li>
+        </ol>
+      </div>
+    </div>
   </section>
 
   <section class="section" id="sumber">
@@ -603,7 +716,11 @@ footer p { color: var(--ink-soft); font-size: var(--step--1); max-width: 60ch; }
 
 <footer>
   <div class="wrap">
-    <div class="brand" style="font-size: 1.05rem">Qorybook</div>
+    <div class="foot-links">
+      <div class="brand" style="font-size: 1.05rem">Qorybook</div>
+      <a href="https://drive.google.com/file/d/13wMP62IKeAUWDRqTq0lYoUQDHSJKvjwO/view?usp=sharing" target="_blank" rel="noopener">Unduh APK</a>
+      <a href="https://saweria.co/qorybook" target="_blank" rel="noopener">Dukung di Saweria</a>
+    </div>
     <p>Dikembangkan oleh Tim Qorybook. Tangkapan layar diambil dari aplikasi Qorybook 1.0 di Android, memakai data contoh (profil Aisyah dan Bima). Sampul buku pada animasi 3D berasal dari katalog BUDI Kemendikdasmen.</p>
   </div>
 </footer>
