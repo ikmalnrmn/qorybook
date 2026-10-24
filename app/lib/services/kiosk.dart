@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Keadaan penguncian perangkat (lihat KioskChannel.kt).
 class KioskStatus {
@@ -84,5 +85,14 @@ class KioskService {
   Future<void> openSecuritySettings() => _call<bool>('openSecuritySettings');
 
   /// Buka tautan di browser. Mengembalikan false bila tidak ada aplikasi yang bisa membukanya.
-  Future<bool> openUrl(String url) async => await _call<bool>('openUrl', {'url': url}) ?? false;
+  Future<bool> openUrl(String url) async {
+    if (kIsWeb) {
+      try {
+        return await launchUrl(Uri.parse(url), webOnlyWindowName: '_blank');
+      } catch (_) {
+        return false;
+      }
+    }
+    return await _call<bool>('openUrl', {'url': url}) ?? false;
+  }
 }

@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config.dart';
 import '../models/contribution.dart';
+import '../models/supporter.dart';
 
 /// Pengaturan kecil yang disimpan di SharedPreferences.
 class SettingsStore {
@@ -30,6 +32,10 @@ class SettingsStore {
 
   static const _kDonationBannerHidden = 'donation_banner_hidden';
   static const _kContributions = 'contributions';
+  static const _kInstallId = 'install_id';
+  static const _kTelemetry = 'telemetry_enabled';
+  static const _kLastPing = 'telemetry_last_ping';
+  static const _kSupporter = 'supporter';
 
   int get activeProfileId => _prefs.getInt(_kProfileId) ?? 1;
   set activeProfileId(int v) => _prefs.setInt(_kProfileId, v);
@@ -101,6 +107,32 @@ class SettingsStore {
     for (final e in contributions)
       if (!(e.date == c.date && e.amount == c.amount && e.note == c.note)) e,
   ]);
+
+  /// ID acak per pemasangan untuk penghitungan anonim; dibuat sekali.
+  String get installId {
+    var id = _prefs.getString(_kInstallId);
+    if (id == null) {
+      final r = Random.secure();
+      id = List.generate(16, (_) => r.nextInt(256).toRadixString(16).padLeft(2, '0')).join();
+      _prefs.setString(_kInstallId, id);
+    }
+    return id;
+  }
+
+  /// Penghitungan pengguna anonim; orang tua boleh mematikannya.
+  bool get telemetryEnabled => _prefs.getBool(_kTelemetry) ?? true;
+  set telemetryEnabled(bool v) => _prefs.setBool(_kTelemetry, v);
+
+  String? get lastPingDay => _prefs.getString(_kLastPing);
+  set lastPingDay(String? v) => v == null ? _prefs.remove(_kLastPing) : _prefs.setString(_kLastPing, v);
+
+  Supporter? get supporter {
+    final raw = _prefs.getString(_kSupporter);
+    return raw == null ? null : Supporter.fromJson(jsonDecode(raw) as Map<String, Object?>);
+  }
+
+  set supporter(Supporter? v) =>
+      v == null ? _prefs.remove(_kSupporter) : _prefs.setString(_kSupporter, jsonEncode(v.toJson()));
 
   List<String> get recentSearches => _prefs.getStringList(_kRecentSearches) ?? const [];
 

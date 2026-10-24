@@ -155,8 +155,10 @@ class BookDetailScreen extends StatelessWidget {
                         label: Text(actionLabel),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    _OfflineButton(book: book),
+                    if (context.read<AppState>().files.supportsOffline) ...[
+                      const SizedBox(width: 12),
+                      _OfflineButton(book: book),
+                    ],
                   ],
                 ),
                 if (book.synopsis.isNotEmpty) ...[

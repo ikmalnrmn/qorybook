@@ -1,0 +1,9 @@
+name = "qorybook-proxy"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+[vars]
+# Isi dengan origin situs web Qorybook (pisahkan koma), mis.:
+#   ALLOWED_ORIGINS = "https://qorybook.vercel.app"
+# localhost selalu diizinkan untuk pengembangan. Kosong = semua origin boleh.
+ALLOWED_ORIGINS = ""

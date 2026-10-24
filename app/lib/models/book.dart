@@ -2,6 +2,8 @@
 /// catalog/build_catalog.py.
 library;
 
+import '../config.dart';
+
 enum BookFormat { pdf, audio, video }
 
 class Book {
@@ -52,6 +54,10 @@ class Book {
   final double? rating;
   final int views;
   final DateTime? updatedAt;
+
+  /// Sampul dan media yang bisa dimuat platform ini (di web, BUDI lewat proxy).
+  String get coverUrl => AppConfig.viaProxy(cover);
+  String get mediaUrl => AppConfig.viaProxy(media);
 
   String get sourceName => source == 'sibi' ? 'SIBI Kemendikdasmen' : 'BUDI Kemendikdasmen';
 

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +12,7 @@ class KidModeChecklist extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) return const _WebChecklist();
     final kid = context.watch<KidModeController>();
     final s = kid.status;
     return Column(
@@ -49,6 +51,33 @@ class KidModeChecklist extends StatelessWidget {
                   'Pastikan "Minta PIN sebelum melepas sematan" menyala di pengaturan keamanan.',
           },
           action: s.pinToUnpin == true ? null : ('Periksa pengaturan', kid.kiosk.openSecuritySettings),
+        ),
+      ],
+    );
+  }
+}
+
+/// Versi web tidak bisa mengunci layar sendiri; orang tua memakai fitur bawaan HP-nya.
+class _WebChecklist extends StatelessWidget {
+  const _WebChecklist();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [
+        _CheckItem(
+          state: _State.info,
+          emoji: '📱',
+          title: 'Kunci anak di Qorybook',
+          message:
+              'Di iPhone/iPad, nyalakan Akses Terpandu di Pengaturan > Aksesibilitas > Akses Terpandu. '
+              'Lalu klik tiga kali tombol samping (atau tombol Home) saat Qorybook terbuka.',
+        ),
+        _CheckItem(
+          state: _State.info,
+          emoji: '🔕',
+          title: 'Senyapkan notifikasi',
+          message: 'Nyalakan Fokus atau Jangan Ganggu dari Pusat Kontrol sebelum anak mulai membaca.',
         ),
       ],
     );

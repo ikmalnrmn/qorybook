@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../config.dart';
 import '../models/contribution.dart';
 import '../screens/parent/family_screen.dart';
+import '../services/telemetry.dart';
 import '../state/app_state.dart';
 import '../state/kid_mode.dart';
 import '../theme.dart';
@@ -30,7 +33,9 @@ class Donation {
       messenger.showSnackBar(const SnackBar(content: Text('Tautan donasi Saweria segera hadir. Terima kasih! 💛')));
       return false;
     }
-    final ok = await context.read<KidModeController>().kiosk.openUrl(AppConfig.donationUrl);
+    final kiosk = context.read<KidModeController>().kiosk;
+    unawaited(context.read<Telemetry>().event('donate_tap'));
+    final ok = await kiosk.openUrl(AppConfig.donationUrl);
     if (!ok) {
       messenger.showSnackBar(const SnackBar(content: Text('Tidak ada browser untuk membuka Saweria.')));
     }

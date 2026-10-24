@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -91,35 +92,36 @@ class ParentHome extends StatelessWidget {
                   const SizedBox(height: 28),
                   Text('Mode Anak', style: text.titleLarge),
                   const SizedBox(height: 6),
-                  _SettingsCard(
-                    children: [
-                      SwitchListTile(
-                        secondary: const Text('📌', style: TextStyle(fontSize: 26)),
-                        title: const Text('Sematkan layar'),
-                        subtitle: const Text('Anak tidak bisa membuka aplikasi lain atau kembali ke layar utama'),
-                        value: settings.kioskPinScreen,
-                        onChanged: (v) => toggle(() => settings.kioskPinScreen = v),
-                      ),
-                      SwitchListTile(
-                        secondary: const Text('🔕', style: TextStyle(fontSize: 26)),
-                        title: const Text('Senyapkan notifikasi'),
-                        subtitle: Text(
-                          kid.status.dndAccess || !kid.status.available
-                              ? 'Jangan Ganggu menyala selama Mode Anak'
-                              : 'Perlu izin Jangan Ganggu (lihat di bawah)',
+                  if (!kIsWeb)
+                    _SettingsCard(
+                      children: [
+                        SwitchListTile(
+                          secondary: const Text('📌', style: TextStyle(fontSize: 26)),
+                          title: const Text('Sematkan layar'),
+                          subtitle: const Text('Anak tidak bisa membuka aplikasi lain atau kembali ke layar utama'),
+                          value: settings.kioskPinScreen,
+                          onChanged: (v) => toggle(() => settings.kioskPinScreen = v),
                         ),
-                        value: settings.kioskDnd,
-                        onChanged: (v) => toggle(() => settings.kioskDnd = v),
-                      ),
-                      SwitchListTile(
-                        secondary: const Text('📞', style: TextStyle(fontSize: 26)),
-                        title: const Text('Izinkan telepon penting'),
-                        subtitle: const Text('Telepon dari kontak berbintang tetap masuk'),
-                        value: settings.kioskAllowCalls,
-                        onChanged: settings.kioskDnd ? (v) => toggle(() => settings.kioskAllowCalls = v) : null,
-                      ),
-                    ],
-                  ),
+                        SwitchListTile(
+                          secondary: const Text('🔕', style: TextStyle(fontSize: 26)),
+                          title: const Text('Senyapkan notifikasi'),
+                          subtitle: Text(
+                            kid.status.dndAccess || !kid.status.available
+                                ? 'Jangan Ganggu menyala selama Mode Anak'
+                                : 'Perlu izin Jangan Ganggu (lihat di bawah)',
+                          ),
+                          value: settings.kioskDnd,
+                          onChanged: (v) => toggle(() => settings.kioskDnd = v),
+                        ),
+                        SwitchListTile(
+                          secondary: const Text('📞', style: TextStyle(fontSize: 26)),
+                          title: const Text('Izinkan telepon penting'),
+                          subtitle: const Text('Telepon dari kontak berbintang tetap masuk'),
+                          value: settings.kioskAllowCalls,
+                          onChanged: settings.kioskDnd ? (v) => toggle(() => settings.kioskAllowCalls = v) : null,
+                        ),
+                      ],
+                    ),
                   const SizedBox(height: 12),
                   const KidModeChecklist(),
                   const SizedBox(height: 18),

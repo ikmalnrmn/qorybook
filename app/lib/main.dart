@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -6,10 +8,12 @@ import 'data/book_files.dart';
 import 'data/catalog_repository.dart';
 import 'data/database.dart';
 import 'data/settings_store.dart';
+import 'platform_init.dart';
 import 'screens/kid_shell.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/parent/parent_home.dart';
 import 'services/parent_auth.dart';
+import 'services/telemetry.dart';
 import 'state/app_state.dart';
 import 'state/kid_mode.dart';
 import 'state/screen_time.dart';
@@ -26,6 +30,7 @@ Future<void> main() async {
     ),
   );
 
+  initPlatform();
   final db = await AppDatabase.open();
   final settings = await SettingsStore.open();
   final state = AppState(
@@ -37,7 +42,9 @@ Future<void> main() async {
   final kidMode = KidModeController(settings: settings);
   final auth = ParentAuth(settings);
   final screenTime = ScreenTimeController(app: state, kid: kidMode, db: db, settings: settings);
-  runApp(QorybookApp(state: state, kidMode: kidMode, auth: auth, screenTime: screenTime));
+  final telemetry = Telemetry(settings: settings);
+  runApp(QorybookApp(state: state, kidMode: kidMode, auth: auth, screenTime: screenTime, telemetry: telemetry));
+  unawaited(telemetry.ping());
 
   await kidMode.init();
   // Aplikasi selalu dibuka dalam Mode Anak; Area Orang Tua hanya lewat PIN.
@@ -53,12 +60,16 @@ class QorybookApp extends StatelessWidget {
     required this.kidMode,
     required this.auth,
     required this.screenTime,
+    this.telemetry,
   });
 
   final AppState state;
   final KidModeController kidMode;
   final ParentAuth auth;
   final ScreenTimeController screenTime;
+
+  /// Tanpa ini (mis. di tes), penghitungan pengguna tidak aktif.
+  final Telemetry? telemetry;
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +79,9 @@ class QorybookApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: kidMode),
         Provider.value(value: auth),
         ChangeNotifierProvider.value(value: screenTime),
+        Provider.value(
+          value: telemetry ?? Telemetry(settings: state.settings, baseUrl: '', anonKey: ''),
+        ),
       ],
       child: MaterialApp(
         title: 'Qorybook',

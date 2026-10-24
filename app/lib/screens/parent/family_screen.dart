@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../config.dart';
 import '../../models/contribution.dart';
+import '../../models/supporter.dart';
+import '../../services/telemetry.dart';
 import '../../state/app_state.dart';
 import '../../theme.dart';
 import '../../widgets/donation.dart';
@@ -19,6 +23,8 @@ class FamilyScreen extends StatefulWidget {
 class _FamilyScreenState extends State<FamilyScreen> with WidgetsBindingObserver {
   /// Orang tua baru saja dibawa ke Saweria; tawarkan pencatatan saat kembali.
   bool _awaitingReturn = false;
+
+  int _supporterVersion = 0;
 
   @override
   void initState() {
@@ -57,7 +63,9 @@ class _FamilyScreenState extends State<FamilyScreen> with WidgetsBindingObserver
       builder: (_) => const _RecordSheet(),
     );
     if (c == null || !mounted) return;
+    final telemetry = context.read<Telemetry>();
     await context.read<AppState>().addContribution(c);
+    unawaited(telemetry.event('donation_recorded', data: {'amount': c.amount}));
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -115,6 +123,10 @@ class _FamilyScreenState extends State<FamilyScreen> with WidgetsBindingObserver
                 style: text.bodySmall,
                 textAlign: TextAlign.center,
               ),
+              if (context.read<Telemetry>().configured) ...[
+                const SizedBox(height: 20),
+                _SupporterCard(key: ValueKey(_supporterVersion), onChanged: () => setState(() => _supporterVersion++)),
+              ],
               const SizedBox(height: 28),
               Row(
                 children: [
@@ -292,6 +304,154 @@ class _SplitCard extends StatelessWidget {
           ),
           row('🤲', '$charity%', 'Pendidikan anak yatim & dhuafa', Donation.charity, QColors.leaf),
         ],
+      ),
+    );
+  }
+}
+
+/// Ajakan opsional untuk memperkenalkan diri supaya developer bisa mengucapkan terima kasih.
+class _SupporterCard extends StatelessWidget {
+  const _SupporterCard({super.key, required this.onChanged});
+
+  final VoidCallback onChanged;
+
+  Future<void> _edit(BuildContext context) async {
+    final telemetry = context.read<Telemetry>();
+    final messenger = ScaffoldMessenger.of(context);
+    final result = await showModalBottomSheet<Supporter>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) => _SupporterSheet(initial: telemetry.settings.supporter),
+    );
+    if (result == null) return;
+    final ok = await telemetry.saveSupporter(result);
+    onChanged();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          ok ? 'Terima kasih sudah berkenalan 💛' : 'Tersimpan di HP ini. Pengiriman gagal, coba lagi nanti.',
+        ),
+      ),
+    );
+  }
+
+  Future<void> _forget(BuildContext context) async {
+    await context.read<Telemetry>().forgetSupporter();
+    onChanged();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final s = context.read<Telemetry>().settings.supporter;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF1D6),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: QColors.sun, width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(s == null ? 'Mau kami ucapkan terima kasih?' : 'Halo, ${s.nickname}! 💛', style: text.titleSmall),
+          const SizedBox(height: 4),
+          Text(
+            s == null
+                ? 'Perkenalkan dirimu supaya kami bisa menyapa. Ini opsional, hanya untuk orang tua, '
+                      'dan tidak pernah berisi data anak.'
+                : (s.consent ? 'Kami boleh menghubungimu untuk ucapan terima kasih.' : 'Hanya tersimpan di HP ini.'),
+            style: text.bodySmall,
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              FilledButton.tonal(onPressed: () => _edit(context), child: Text(s == null ? 'Perkenalkan diri' : 'Ubah')),
+              if (s != null) ...[
+                const SizedBox(width: 8),
+                TextButton(onPressed: () => _forget(context), child: const Text('Hapus')),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SupporterSheet extends StatefulWidget {
+  const _SupporterSheet({this.initial});
+
+  final Supporter? initial;
+
+  @override
+  State<_SupporterSheet> createState() => _SupporterSheetState();
+}
+
+class _SupporterSheetState extends State<_SupporterSheet> {
+  late final _nickname = TextEditingController(text: widget.initial?.nickname ?? '');
+  late final _contact = TextEditingController(text: widget.initial?.contact ?? '');
+  late bool _consent = widget.initial?.consent ?? false;
+
+  @override
+  void dispose() {
+    _nickname.dispose();
+    _contact.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final valid = _nickname.text.trim().isNotEmpty;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 0, 20, 20 + MediaQuery.viewInsetsOf(context).bottom),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Perkenalkan dirimu', style: text.titleLarge),
+            const SizedBox(height: 4),
+            Text('Isi seperlunya. Jangan masukkan nama atau data anak.', style: text.bodySmall),
+            const SizedBox(height: 14),
+            TextField(
+              controller: _nickname,
+              maxLength: 40,
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(labelText: 'Nama panggilan', hintText: 'mis. Bunda Rani'),
+              onChanged: (_) => setState(() {}),
+            ),
+            TextField(
+              controller: _contact,
+              maxLength: 80,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(labelText: 'Email atau WhatsApp (opsional)'),
+            ),
+            CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              controlAffinity: ListTileControlAffinity.leading,
+              value: _consent,
+              onChanged: (v) => setState(() => _consent = v ?? false),
+              title: const Text('Boleh dihubungi untuk ucapan terima kasih'),
+              subtitle: const Text('Tanpa persetujuan ini, tidak ada yang dikirim ke server.'),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: !valid
+                    ? null
+                    : () => Navigator.pop(
+                        context,
+                        Supporter(nickname: _nickname.text.trim(), contact: _contact.text.trim(), consent: _consent),
+                      ),
+                child: const Text('Simpan'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

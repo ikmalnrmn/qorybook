@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
-import '../config.dart';
 import '../models/book.dart';
 import '../services/device.dart';
 import '../state/app_state.dart';
@@ -43,19 +42,16 @@ class _MediaPlayerScreenState extends State<MediaPlayerScreen> with WidgetsBindi
     WidgetsBinding.instance.addObserver(this);
     DeviceService.keepScreenOn(true);
     if (isVideo) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    if (isVideo) {
+      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+    }
     _init();
   }
 
   Future<void> _init() async {
     setState(() => _error = null);
     try {
-      final local = await _state.files.localFile(book);
-      final ctrl = local != null
-          ? VideoPlayerController.file(local)
-          : VideoPlayerController.networkUrl(
-              Uri.parse(book.media),
-              httpHeaders: const {'User-Agent': AppConfig.userAgent},
-            );
+      final ctrl = await _state.files.videoController(book);
       await ctrl.initialize();
       final saved = _state.progress[book.id];
       if (saved != null && !saved.finished && saved.position > 0) {
@@ -123,6 +119,7 @@ class _MediaPlayerScreenState extends State<MediaPlayerScreen> with WidgetsBindi
     _ctrl?.dispose();
     DeviceService.keepScreenOn(false);
     if (isVideo) SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    if (isVideo) SystemChrome.setPreferredOrientations(DeviceOrientation.values);
     super.dispose();
   }
 
@@ -458,88 +455,104 @@ class _VideoControls extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     const fg = Colors.white;
     final maxMs = duration.inMilliseconds.toDouble().clamp(1.0, double.infinity);
-    return SafeArea(
-      child: Stack(
-        children: [
-          // Sapuan gelap tipis di atas dan bawah supaya tombol terbaca di atas gambar apa pun.
-          const Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.black54, Colors.transparent, Colors.transparent, Colors.black54],
-                  stops: [0, 0.25, 0.65, 1],
-                ),
-              ),
+    // Column (bukan Stack + Align) supaya bilah atas, tombol tengah, dan bilah bawah
+    // pasti menempati tepi atas, tengah, dan tepi bawah layar.
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // Sapuan gelap tipis di atas dan bawah supaya tombol terbaca di atas gambar apa pun.
+        const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Colors.black54, Colors.transparent, Colors.transparent, Colors.black54],
+              stops: [0, 0.25, 0.65, 1],
             ),
           ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: Row(
-              children: [
-                IconButton(color: fg, tooltip: 'Kembali', onPressed: onBack, icon: const Icon(Icons.arrow_back_rounded)),
-                Expanded(
-                  child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: text.titleMedium?.copyWith(color: fg)),
-                ),
-                IconButton(color: fg, tooltip: 'Kunci layar', onPressed: onLock, icon: const Icon(Icons.lock_open_rounded)),
-              ],
-            ),
-          ),
-          Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  tooltip: 'Mundur 10 detik',
-                  iconSize: 40,
-                  color: fg,
-                  onPressed: () => onSkip(-10),
-                  icon: const Icon(Icons.replay_10_rounded),
-                ),
-                const SizedBox(width: 24),
-                SizedBox(
-                  width: 68,
-                  height: 68,
-                  child: FilledButton(
-                    style: FilledButton.styleFrom(shape: const CircleBorder(), padding: EdgeInsets.zero),
-                    onPressed: onToggle,
-                    child: Icon(playing ? Icons.pause_rounded : Icons.play_arrow_rounded, size: 44),
-                  ),
-                ),
-                const SizedBox(width: 24),
-                IconButton(
-                  tooltip: 'Maju 10 detik',
-                  iconSize: 40,
-                  color: fg,
-                  onPressed: () => onSkip(10),
-                  icon: const Icon(Icons.forward_10_rounded),
-                ),
-              ],
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
-              child: Row(
+        ),
+        SafeArea(
+          child: Column(
+            children: [
+              Row(
                 children: [
-                  Text(fmt(position), style: text.labelMedium?.copyWith(color: fg)),
+                  IconButton(
+                    color: fg,
+                    tooltip: 'Kembali',
+                    onPressed: onBack,
+                    icon: const Icon(Icons.arrow_back_rounded),
+                  ),
                   Expanded(
-                    child: Slider(
-                      min: 0,
-                      max: maxMs,
-                      value: position.inMilliseconds.clamp(0, duration.inMilliseconds).toDouble(),
-                      onChanged: (x) => onSeek(x.round()),
+                    child: Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: text.titleMedium?.copyWith(color: fg),
                     ),
                   ),
-                  Text(fmt(duration), style: text.labelMedium?.copyWith(color: fg)),
+                  IconButton(
+                    color: fg,
+                    tooltip: 'Kunci layar',
+                    onPressed: onLock,
+                    icon: const Icon(Icons.lock_open_rounded),
+                  ),
                 ],
               ),
-            ),
+              Expanded(
+                child: Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        tooltip: 'Mundur 10 detik',
+                        iconSize: 40,
+                        color: fg,
+                        onPressed: () => onSkip(-10),
+                        icon: const Icon(Icons.replay_10_rounded),
+                      ),
+                      const SizedBox(width: 24),
+                      SizedBox(
+                        width: 68,
+                        height: 68,
+                        child: FilledButton(
+                          style: FilledButton.styleFrom(shape: const CircleBorder(), padding: EdgeInsets.zero),
+                          onPressed: onToggle,
+                          child: Icon(playing ? Icons.pause_rounded : Icons.play_arrow_rounded, size: 44),
+                        ),
+                      ),
+                      const SizedBox(width: 24),
+                      IconButton(
+                        tooltip: 'Maju 10 detik',
+                        iconSize: 40,
+                        color: fg,
+                        onPressed: () => onSkip(10),
+                        icon: const Icon(Icons.forward_10_rounded),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                child: Row(
+                  children: [
+                    Text(fmt(position), style: text.labelMedium?.copyWith(color: fg)),
+                    Expanded(
+                      child: Slider(
+                        min: 0,
+                        max: maxMs,
+                        value: position.inMilliseconds.clamp(0, duration.inMilliseconds).toDouble(),
+                        onChanged: (x) => onSeek(x.round()),
+                      ),
+                    ),
+                    Text(fmt(duration), style: text.labelMedium?.copyWith(color: fg)),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

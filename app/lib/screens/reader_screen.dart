@@ -61,8 +61,8 @@ class _ReaderScreenState extends State<ReaderScreen> with WidgetsBindingObserver
   Future<void> _load() async {
     setState(() => _error = null);
     try {
-      final file = await _state.files.ensureLocal(book);
-      final doc = await NativePdfDocument.open(file.path);
+      final source = await _state.files.ensureLocal(book);
+      final doc = await NativePdfDocument.open(source);
       if (!mounted) {
         await doc.close();
         return;

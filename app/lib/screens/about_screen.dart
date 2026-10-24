@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../services/telemetry.dart';
 import '../state/app_state.dart';
 import '../theme.dart';
 import '../widgets/developer.dart';
@@ -95,47 +96,64 @@ class _AboutScreenState extends State<AboutScreen> {
               style: text.bodySmall,
             ),
           ],
-          const SizedBox(height: 24),
-          Text('Penyimpanan', style: text.titleMedium),
-          const SizedBox(height: 8),
-          _InfoTile(
-            emoji: '💾',
-            title: 'Dipakai: ${_used == null ? '…' : _mb(_used!)}',
-            subtitle: 'Buku yang pernah dibuka disimpan sementara supaya cepat dibuka lagi.',
-          ),
-          const SizedBox(height: 8),
-          Text('Batas simpanan sementara', style: text.labelLarge),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            children: [
-              for (final l in limits)
-                ChoiceChip(
-                  label: Text(_mb(l)),
-                  selected: state.settings.cacheLimitBytes == l,
-                  onSelected: (_) {
-                    setState(() {
-                      state.settings.cacheLimitBytes = l;
-                      state.files.cacheLimitBytes = l;
-                    });
-                  },
-                ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          OutlinedButton.icon(
-            onPressed: () async {
-              await state.files.clearCache();
-              await _refreshUsage();
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Simpanan sementara dibersihkan. Buku offline tetap ada.')),
-                );
-              }
-            },
-            icon: const Icon(Icons.cleaning_services_rounded),
-            label: const Text('Bersihkan simpanan sementara'),
-          ),
+          if (state.files.supportsOffline) ...[
+            const SizedBox(height: 24),
+            Text('Penyimpanan', style: text.titleMedium),
+            const SizedBox(height: 8),
+            _InfoTile(
+              emoji: '💾',
+              title: 'Dipakai: ${_used == null ? '…' : _mb(_used!)}',
+              subtitle: 'Buku yang pernah dibuka disimpan sementara supaya cepat dibuka lagi.',
+            ),
+            const SizedBox(height: 8),
+            Text('Batas simpanan sementara', style: text.labelLarge),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: [
+                for (final l in limits)
+                  ChoiceChip(
+                    label: Text(_mb(l)),
+                    selected: state.settings.cacheLimitBytes == l,
+                    onSelected: (_) {
+                      setState(() {
+                        state.settings.cacheLimitBytes = l;
+                        state.files.cacheLimitBytes = l;
+                      });
+                    },
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: () async {
+                await state.files.clearCache();
+                await _refreshUsage();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Simpanan sementara dibersihkan. Buku offline tetap ada.')),
+                  );
+                }
+              },
+              icon: const Icon(Icons.cleaning_services_rounded),
+              label: const Text('Bersihkan simpanan sementara'),
+            ),
+          ],
+          if (context.read<Telemetry>().configured) ...[
+            const SizedBox(height: 24),
+            Text('Privasi', style: text.titleMedium),
+            const SizedBox(height: 8),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              value: state.settings.telemetryEnabled,
+              onChanged: (v) => setState(() => state.settings.telemetryEnabled = v),
+              title: const Text('Bantu kami menghitung pengguna'),
+              subtitle: const Text(
+                'Mengirim ID acak, versi aplikasi, dan ketukan tombol donasi. Tanpa nama, tanpa data anak, '
+                'tanpa riwayat bacaan.',
+              ),
+            ),
+          ],
           const SizedBox(height: 24),
           Text('Developer', style: text.titleMedium),
           const SizedBox(height: 8),

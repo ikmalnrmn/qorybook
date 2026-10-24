@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -212,8 +213,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: Column(
         children: [
           point('🏛️', 'Buku resmi & gratis', 'Lebih dari 1.400 buku bacaan PAUD–SD dari SIBI dan BUDI.'),
-          point('📌', 'Anak tetap di aplikasi', 'Layar disematkan; keluar hanya dengan PIN orang tua atau kunci HP.'),
-          point('🔕', 'Tanpa gangguan', 'Notifikasi disenyapkan selama anak membaca.'),
+          if (kIsWeb) ...[
+            point(
+              '📌',
+              'Anak tetap di aplikasi',
+              'Kunci layar dengan Akses Terpandu; keluar dari Mode Anak hanya dengan PIN orang tua.',
+            ),
+            point('🔕', 'Tanpa gangguan', 'Nyalakan Fokus atau Jangan Ganggu di HP selama anak membaca.'),
+          ] else ...[
+            point('📌', 'Anak tetap di aplikasi', 'Layar disematkan; keluar hanya dengan PIN orang tua atau kunci HP.'),
+            point('🔕', 'Tanpa gangguan', 'Notifikasi disenyapkan selama anak membaca.'),
+          ],
           point('👧', 'Profil tiap anak', 'Jenjang buku, progres, dan rak buku masing-masing.'),
           const SizedBox(height: 6),
           const DisclaimerCard(),
@@ -262,7 +272,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return _stepScaffold(
       emoji: '🛡️',
       title: 'Siapkan Mode Anak',
-      subtitle: 'Lengkapi langkah di bawah agar anak tidak bisa keluar dari aplikasi dan tidak terganggu notifikasi.',
+      subtitle: kIsWeb
+          ? 'Dua langkah di bawah membuat anak tetap di Qorybook dan tidak terganggu notifikasi.'
+          : 'Lengkapi langkah di bawah agar anak tidak bisa keluar dari aplikasi dan tidak terganggu notifikasi.',
       body: const KidModeChecklist(),
       bottom: FilledButton.icon(
         onPressed: _finish,

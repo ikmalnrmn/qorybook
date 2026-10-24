@@ -32,7 +32,7 @@ class BookCover extends StatelessWidget {
               fallback
             else
               CachedNetworkImage(
-                imageUrl: book.cover,
+                imageUrl: book.coverUrl,
                 httpHeaders: const {'User-Agent': AppConfig.userAgent},
                 fit: BoxFit.cover,
                 memCacheWidth: decodeWidth,
