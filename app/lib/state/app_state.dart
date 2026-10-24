@@ -7,6 +7,7 @@ import '../data/catalog_repository.dart';
 import '../data/database.dart';
 import '../data/settings_store.dart';
 import '../models/book.dart';
+import '../models/contribution.dart';
 import '../models/profile.dart';
 import '../services/search.dart';
 
@@ -143,6 +144,27 @@ class AppState extends ChangeNotifier {
       approvedIds = await db.approvedBooks(profileId);
       notifyListeners();
     }
+  }
+
+  // ---- Keluarga Literasi (donasi) ------------------------------------------
+
+  List<Contribution> get contributions => settings.contributions;
+
+  Future<void> addContribution(Contribution c) async {
+    await settings.addContribution(c);
+    notifyListeners();
+  }
+
+  Future<void> removeContribution(Contribution c) async {
+    await settings.removeContribution(c);
+    notifyListeners();
+  }
+
+  bool get donationBannerHidden => settings.donationBannerHidden;
+
+  void hideDonationBanner() {
+    settings.donationBannerHidden = true;
+    notifyListeners();
   }
 
   Future<void> _loadUserData() async {

@@ -18,6 +18,7 @@ import 'package:qorybook/state/kid_mode.dart';
 import 'package:qorybook/state/screen_time.dart';
 import 'package:qorybook/widgets/book_cover.dart';
 import 'package:qorybook/widgets/disclaimer.dart';
+import 'package:qorybook/widgets/donation.dart';
 import 'package:qorybook/widgets/hold_button.dart';
 import 'package:qorybook/widgets/pin_pad.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -311,8 +312,9 @@ void main() {
       await _shot(tester, '${device.name}_11_area_orang_tua');
 
       // Matikan Jangan Ganggu dari pengaturan.
-      await tester.ensureVisible(find.text('Senyapkan notifikasi').first);
-      await tester.tap(find.text('Senyapkan notifikasi').first);
+      final dndSwitch = find.widgetWithText(SwitchListTile, 'Senyapkan notifikasi');
+      await tester.scrollUntilVisible(dndSwitch, 300, scrollable: find.byType(Scrollable).first);
+      await tester.tap(dndSwitch);
       await tester.pump();
       expect(app.settings.kioskDnd, isFalse);
 
@@ -420,6 +422,60 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('✅ Dipilih (3)'), findsOneWidget);
       await _shot(tester, '${device.name}_16_pilih_buku');
+      await _teardown(tester, app);
+    });
+
+    testWidgets('Keluarga Literasi: banner, Saweria, catat kontribusi (${device.name})', (tester) async {
+      final app = await _pumpApp(tester, device, FakeDatabase());
+      await tester.runAsync(app.kid.exit);
+      await tester.pumpAndSettle();
+      expect(find.text(Donation.invite), findsOneWidget);
+      await tester.ensureVisible(find.text(Donation.bannerTitle));
+      await tester.pumpAndSettle();
+      await _shot(tester, '${device.name}_17_banner_donasi');
+
+      await tester.tap(find.text('Jangan tampilkan lagi'));
+      await tester.pumpAndSettle();
+      expect(find.text(Donation.bannerTitle), findsNothing);
+      expect(app.settings.donationBannerHidden, isTrue);
+
+      await tester.scrollUntilVisible(find.text(Donation.invite), -300, scrollable: find.byType(Scrollable).first);
+      await tester.ensureVisible(find.text(Donation.invite));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(Donation.invite));
+      await tester.pumpAndSettle();
+      expect(find.text('Ke mana donasimu pergi?'), findsOneWidget);
+      expect(find.text('Belum ada kontribusi tercatat'), findsOneWidget);
+      await _shot(tester, '${device.name}_18_keluarga_literasi');
+
+      // Tautan Saweria belum diisi di build tes.
+      await tester.ensureVisible(find.text('Donasi lewat Saweria'));
+      await tester.tap(find.text('Donasi lewat Saweria'));
+      await tester.pump();
+      expect(find.textContaining('segera hadir'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Catat donasi'));
+      await tester.tap(find.text('Catat donasi'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Rp 50.000'));
+      await tester.pump();
+      expect(find.textContaining('Rp 10.000 akan disalurkan'), findsOneWidget);
+      await tester.enterText(find.byType(TextField).last, 'Donasi bulan Oktober');
+      await tester.tap(find.text('Simpan'));
+      await tester.pumpAndSettle();
+      expect(app.state.contributions.single.amount, 50000);
+      expect(find.text('Rp 50.000 dari 1 kontribusi'), findsOneWidget);
+      expect(find.textContaining('Donasi bulan Oktober'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
+      await _shot(tester, '${device.name}_19_kontribusi');
+
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(find.text('Terima kasih, Keluarga Literasi!'), findsOneWidget);
+      expect(find.text('1 kontribusi · Rp 50.000'), findsOneWidget);
       await _teardown(tester, app);
     });
   }

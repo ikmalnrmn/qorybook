@@ -8,6 +8,7 @@ import '../../state/app_state.dart';
 import '../../state/kid_mode.dart';
 import '../../state/screen_time.dart';
 import '../../theme.dart';
+import '../../widgets/donation.dart';
 import '../../widgets/kid_mode_checklist.dart';
 import '../about_screen.dart';
 import 'change_pin_screen.dart';
@@ -63,6 +64,8 @@ class ParentHome extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 16),
+                  const FamilyInviteTile(),
                   const SizedBox(height: 20),
                   Text('Siapa yang mau membaca?', style: text.titleLarge),
                   const SizedBox(height: 10),
@@ -83,6 +86,7 @@ class ParentHome extends StatelessWidget {
                       icon: const Icon(Icons.person_add_alt_1_rounded),
                       label: const Text('Tambah profil anak'),
                     ),
+                  const DonationBanner(),
                   const SizedBox(height: 28),
                   Text('Mode Anak', style: text.titleLarge),
                   const SizedBox(height: 6),

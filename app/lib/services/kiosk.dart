@@ -82,4 +82,7 @@ class KioskService {
   Future<void> openDndAccessSettings() => _call<bool>('openDndAccessSettings');
 
   Future<void> openSecuritySettings() => _call<bool>('openSecuritySettings');
+
+  /// Buka tautan di browser. Mengembalikan false bila tidak ada aplikasi yang bisa membukanya.
+  Future<bool> openUrl(String url) async => await _call<bool>('openUrl', {'url': url}) ?? false;
 }

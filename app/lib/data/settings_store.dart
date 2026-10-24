@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config.dart';
+import '../models/contribution.dart';
 
 /// Pengaturan kecil yang disimpan di SharedPreferences.
 class SettingsStore {
@@ -24,6 +27,9 @@ class SettingsStore {
   static const _kKioskPin = 'kiosk_pin_screen';
   static const _kKioskDnd = 'kiosk_dnd';
   static const _kKioskCalls = 'kiosk_allow_calls';
+
+  static const _kDonationBannerHidden = 'donation_banner_hidden';
+  static const _kContributions = 'contributions';
 
   int get activeProfileId => _prefs.getInt(_kProfileId) ?? 1;
   set activeProfileId(int v) => _prefs.setInt(_kProfileId, v);
@@ -72,6 +78,29 @@ class SettingsStore {
   /// Tetap izinkan telepon dari kontak berbintang saat Jangan Ganggu.
   bool get kioskAllowCalls => _prefs.getBool(_kKioskCalls) ?? true;
   set kioskAllowCalls(bool v) => _prefs.setBool(_kKioskCalls, v);
+
+  /// Orang tua memilih "Jangan tampilkan lagi" pada banner donasi.
+  bool get donationBannerHidden => _prefs.getBool(_kDonationBannerHidden) ?? false;
+  set donationBannerHidden(bool v) => _prefs.setBool(_kDonationBannerHidden, v);
+
+  /// Donasi Keluarga Literasi yang dicatat orang tua, terbaru lebih dulu.
+  List<Contribution> get contributions {
+    final list = (_prefs.getStringList(_kContributions) ?? const [])
+        .map((s) => Contribution.fromJson(jsonDecode(s) as Map<String, Object?>))
+        .toList();
+    list.sort((a, b) => b.date.compareTo(a.date));
+    return list;
+  }
+
+  Future<void> _saveContributions(List<Contribution> list) =>
+      _prefs.setStringList(_kContributions, [for (final c in list) jsonEncode(c.toJson())]);
+
+  Future<void> addContribution(Contribution c) => _saveContributions([c, ...contributions]);
+
+  Future<void> removeContribution(Contribution c) => _saveContributions([
+    for (final e in contributions)
+      if (!(e.date == c.date && e.amount == c.amount && e.note == c.note)) e,
+  ]);
 
   List<String> get recentSearches => _prefs.getStringList(_kRecentSearches) ?? const [];
 

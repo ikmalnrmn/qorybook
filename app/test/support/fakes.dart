@@ -202,4 +202,10 @@ class FakeKiosk extends KioskService {
 
   @override
   Future<void> openSecuritySettings() async => calls.add('open:security');
+
+  @override
+  Future<bool> openUrl(String url) async {
+    calls.add('open:$url');
+    return true;
+  }
 }

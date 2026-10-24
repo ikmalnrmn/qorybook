@@ -5,8 +5,10 @@ import android.app.ActivityManager
 import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.app.NotificationManager.Policy
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import io.flutter.plugin.common.MethodCall
@@ -48,6 +50,18 @@ class KioskChannel(private val activity: Activity) : MethodChannel.MethodCallHan
                 "openSecuritySettings" -> {
                     open(Intent(Settings.ACTION_SECURITY_SETTINGS))
                     result.success(true)
+                }
+                "openUrl" -> {
+                    // Hanya dipanggil dari Area Orang Tua, saat sematan layar sudah dilepas.
+                    val url = call.argument<String>("url") ?: ""
+                    result.success(
+                        try {
+                            open(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                            true
+                        } catch (e: ActivityNotFoundException) {
+                            false
+                        }
+                    )
                 }
                 else -> result.notImplemented()
             }
