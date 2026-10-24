@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#FF7A45">
+<title>Pantau Qorybook</title>
+<style>
+:root {
+  --paper: #FFF8EF; --surface: #FFFFFF; --band: #FFEFDF; --ink: #2B2D42; --ink-soft: #6B6F80; --line: #F0E6DA;
+  --orange: #FF7A45; --orange-deep: #E85D2A; --leaf: #2E9E6B; --warn: #C8382F; --chip: #FFE6D6;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #17182A; --surface: #23253B; --band: #202238; --ink: #F5EFE6; --ink-soft: #ABA8BF; --line: #34365A;
+    --orange: #FF8A5B; --orange-deep: #FF9A70; --leaf: #5BD39C; --warn: #FF8A80; --chip: #3A2C2E; color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink); line-height: 1.5; -webkit-font-smoothing: antialiased;
+  font: 16px/1.5 "Nunito", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+}
+.wrap { max-width: 1040px; margin: 0 auto; padding: 20px max(16px, env(safe-area-inset-right)) 56px max(16px, env(safe-area-inset-left)); }
+h1, h2 { margin: 0; line-height: 1.15; letter-spacing: -0.01em; }
+h1 { font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2.1rem); }
+h2 { font-size: 1.15rem; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; border-radius: 8px; }
+[hidden] { display: none !important; }
+
+.btn {
+  padding: 10px 18px; border-radius: 14px; border: 1.5px solid var(--line); background: var(--surface); font-weight: 800;
+}
+.btn.primary { background: var(--orange); border-color: var(--orange); color: #fff; }
+.btn:disabled { opacity: .6; cursor: default; }
+
+/* gerbang */
+.gate { max-width: 420px; margin: 12vh auto 0; display: grid; gap: 14px; }
+.gate p { margin: 0; color: var(--ink-soft); }
+.gate input[type="password"], .gate input[type="text"] {
+  width: 100%; padding: 12px 14px; border-radius: 14px; border: 1.5px solid var(--line); background: var(--surface);
+}
+.gate label.check { display: flex; gap: 8px; align-items: center; color: var(--ink-soft); font-size: .95rem; }
+.err { color: var(--warn); font-weight: 700; min-height: 1.5em; }
+
+/* kepala */
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin-bottom: 20px; }
+.top .meta { color: var(--ink-soft); font-size: .9rem; }
+.top .actions { display: flex; gap: 8px; }
+
+/* angka */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; min-width: 0; }
+.tile .n { font-size: clamp(1.7rem, 1.3rem + 1.6vw, 2.4rem); font-weight: 900; line-height: 1.1; color: var(--orange-deep); font-variant-numeric: tabular-nums; }
+.tile .l { font-weight: 800; margin-top: 4px; }
+.tile .s { color: var(--ink-soft); font-size: .85rem; line-height: 1.35; margin-top: 2px; }
+
+/* kartu */
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 16px; min-width: 0; }
+.card h2 { margin-bottom: 4px; }
+.card .sub { color: var(--ink-soft); font-size: .88rem; margin: 0 0 12px; }
+@media (max-width: 760px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+
+/* grafik batang */
+.bars { display: flex; align-items: flex-end; gap: 3px; height: 130px; }
+.bars .col { flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; }
+.bars .bar { width: 100%; min-height: 2px; border-radius: 4px 4px 0 0; background: var(--orange); }
+.bars .bar.zero { background: var(--line); }
+.axis { display: flex; justify-content: space-between; color: var(--ink-soft); font-size: .78rem; margin-top: 6px; }
+.empty { color: var(--ink-soft); padding: 20px 0; text-align: center; }
+
+/* daftar rincian */
+.rows { display: grid; gap: 8px; }
+.rows .r { display: grid; grid-template-columns: minmax(70px, 110px) minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: .95rem; }
+.rows .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.rows .track { height: 10px; border-radius: 6px; background: var(--band); overflow: hidden; }
+.rows .fill { height: 100%; background: var(--orange); border-radius: 6px; }
+.rows .v { font-variant-numeric: tabular-nums; font-weight: 800; }
+
+/* pendukung */
+.tablewrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+th, td { text-align: left; padding: 10px 10px 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--ink-soft); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+td a { color: var(--orange-deep); font-weight: 700; word-break: break-all; }
+tr.done td { color: var(--ink-soft); }
+.pill { display: inline-block; padding: 2px 10px; border-radius: 999px; background: var(--chip); color: var(--orange-deep); font-weight: 800; font-size: .8rem; }
+.note { color: var(--ink-soft); font-size: .88rem; margin-top: 18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <form class="gate" id="gate" autocomplete="off">
+    <h1>Pantau Qorybook</h1>
+    <p>Halaman ini khusus pemilik. Masukkan kode akses untuk melihat pemasang, klik unduh, dan pendukung.</p>
+    <input type="password" id="kode" placeholder="Kode akses" aria-label="Kode akses" autocomplete="current-password" required>
+    <label class="check"><input type="checkbox" id="ingat"> Ingat di perangkat ini</label>
+    <button class="btn primary" id="masuk" type="submit">Masuk</button>
+    <div class="err" id="gateErr" role="alert"></div>
+  </form>
+
+  <main id="dash" hidden>
+    <div class="top">
+      <div>
+        <h1>Pantau Qorybook</h1>
+        <div class="meta" id="meta">Memuat…</div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="muat" type="button">Muat ulang</button>
+        <button class="btn" id="keluar" type="button">Keluar</button>
+      </div>
+    </div>
+    <div class="err" id="dashErr" role="alert"></div>
+
+    <section class="tiles" id="tiles" aria-label="Ringkasan"></section>
+
+    <div class="grid2">
+      <section class="card">
+        <h2>Pemasang baru</h2>
+        <p class="sub">Per hari, 30 hari terakhir (aplikasi dibuka pertama kali)</p>
+        <div id="chartPasang"></div>
+      </section>
+      <section class="card">
+        <h2>Klik tombol unduh</h2>
+        <p class="sub">Per hari di halaman promo, 30 hari terakhir</p>
+        <div id="chartUnduh"></div>
+      </section>
+    </div>
+
+    <div class="grid2">
+      <section class="card"><h2>Asal pemasangan</h2><p class="sub">Dari mana APK dibagikan</p><div class="rows" id="rSumber"></div></section>
+      <section class="card"><h2>Platform dan versi</h2><p class="sub">Android atau web, dan versi aplikasi</p><div class="rows" id="rPlatform"></div><div class="rows" id="rVersi" style="margin-top:14px"></div></section>
+    </div>
+
+    <section class="card">
+      <h2>Pendukung</h2>
+      <p class="sub">Orang tua yang memperkenalkan diri dan mengizinkan dihubungi. Yang belum diberi ucapan terima kasih ada di atas.</p>
+      <div class="tablewrap" id="pendukung"></div>
+    </section>
+
+    <p class="note">
+      Klik unduh dihitung dari tombol di halaman promo, bukan dari berkas yang selesai diunduh atau dipasang.
+      Angka pemasang yang sebenarnya adalah jumlah aplikasi yang sudah dibuka. Donasi hanya tercatat bila orang tua
+      menekan "Catat donasi" di aplikasi; cocokkan nominal dan nama dengan dasbor Saweria.
+    </p>
+  </main>
+</div>
+
+<script>
+(function () {
+  var BASE = 'https://fiehwzkuqkslmyzexzgx.supabase.co/rest/v1/rpc/';
+  var KEY = 'sb_publishable_Bl2IiYC9D1ySfDd2rmw7yA_pYitpO6H';
+  var STORE = 'qory_pantau_kode';
+  var $ = function (id) { return document.getElementById(id); };
+  var fmt = new Intl.NumberFormat('id-ID');
+  var rupiah = function (n) { return 'Rp ' + fmt.format(Number(n) || 0); };
+  var kode = null;
+
+  function readKode() {
+    try { return localStorage.getItem(STORE) || sessionStorage.getItem(STORE); } catch (e) { return null; }
+  }
+  function saveKode(k, persist) {
+    try {
+      sessionStorage.setItem(STORE, k);
+      if (persist) localStorage.setItem(STORE, k); else localStorage.removeItem(STORE);
+    } catch (e) {}
+  }
+  function clearKode() { try { localStorage.removeItem(STORE); sessionStorage.removeItem(STORE); } catch (e) {} }
+
+  function rpc(fn, body) {
+    return fetch(BASE + fn, {
+      method: 'POST',
+      headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (res) {
+      if (res.status === 204) return null;
+      return res.json().catch(function () { return null; }).then(function (data) {
+        if (!res.ok) {
+          var err = new Error((data && data.message) || ('HTTP ' + res.status));
+          err.wrongCode = data && data.message === 'kode salah';
+          err.notDeployed = res.status === 404;
+          throw err;
+        }
+        return data;
+      });
+    });
+  }
+
+  function el(tag, props, children) {
+    var e = document.createElement(tag);
+    if (props) Object.keys(props).forEach(function (k) {
+      if (k === 'text') e.textContent = props[k];
+      else if (k === 'class') e.className = props[k];
+      else e.setAttribute(k, props[k]);
+    });
+    (children || []).forEach(function (c) { if (c) e.appendChild(c); });
+    return e;
+  }
+
+  var BULAN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  function tgl(s) { var p = String(s).slice(0, 10).split('-'); return Number(p[2]) + ' ' + BULAN[Number(p[1]) - 1]; }
+  function waktu(s) {
+    var d = new Date(s); if (isNaN(d)) return '-';
+    return d.getDate() + ' ' + BULAN[d.getMonth()] + ' ' + d.getFullYear() + ', ' +
+      ('0' + d.getHours()).slice(-2) + '.' + ('0' + d.getMinutes()).slice(-2);
+  }
+
+  function tile(n, label, sub) {
+    return el('div', { class: 'tile' }, [
+      el('div', { class: 'n', text: n }), el('div', { class: 'l', text: label }), sub ? el('div', { class: 's', text: sub }) : null
+    ]);
+  }
+
+  function chart(target, rows, valueOf, label) {
+    target.textContent = '';
+    var max = rows.reduce(function (m, r) { return Math.max(m, valueOf(r)); }, 0);
+    if (max === 0) { target.appendChild(el('div', { class: 'empty', text: 'Belum ada data' })); return; }
+    var bars = el('div', { class: 'bars', role: 'img', 'aria-label': label });
+    rows.forEach(function (r) {
+      var v = valueOf(r);
+      var bar = el('div', { class: 'bar' + (v === 0 ? ' zero' : ''), title: tgl(r.tgl) + ': ' + v });
+      bar.style.height = (v === 0 ? 2 : Math.max(4, Math.round(v / max * 100))) + '%';
+      bars.appendChild(el('div', { class: 'col' }, [bar]));
+    });
+    target.appendChild(bars);
+    target.appendChild(el('div', { class: 'axis' }, [
+      el('span', { text: tgl(rows[0].tgl) }),
+      el('span', { text: 'puncak ' + max + '/hari' }),
+      el('span', { text: tgl(rows[rows.length - 1].tgl) })
+    ]));
+  }
+
+  function breakdown(target, rows) {
+    target.textContent = '';
+    if (!rows.length) { target.appendChild(el('div', { class: 'empty', text: 'Belum ada data' })); return; }
+    var max = rows[0].n || 1;
+    rows.forEach(function (r) {
+      var fill = el('div', { class: 'fill' }); fill.style.width = Math.max(3, Math.round(r.n / max * 100)) + '%';
+      target.appendChild(el('div', { class: 'r' }, [
+        el('span', { class: 'name', text: r.nama, title: r.nama }), el('div', { class: 'track' }, [fill]), el('span', { class: 'v', text: fmt.format(r.n) })
+      ]));
+    });
+  }
+
+  function kontak(k) {
+    if (!k) return el('span', { text: '-' });
+    if (k.indexOf('@') > 0) return el('a', { href: 'mailto:' + k, text: k });
+    var d = k.replace(/[^0-9+]/g, '');
+    if (d.length >= 9) {
+      var wa = d.charAt(0) === '+' ? d.slice(1) : d.charAt(0) === '0' ? '62' + d.slice(1) : d;
+      return el('a', { href: 'https://wa.me/' + wa, target: '_blank', rel: 'noopener', text: k });
+    }
+    return el('span', { text: k });
+  }
+
+  function pendukung(list) {
+    var box = $('pendukung'); box.textContent = '';
+    if (!list.length) { box.appendChild(el('div', { class: 'empty', text: 'Belum ada yang memperkenalkan diri' })); return; }
+    var head = el('tr', null, ['Nama', 'Kontak', 'Donasi tercatat', 'Terakhir', 'Sudah diucapkan'].map(function (t) { return el('th', { text: t }); }));
+    var body = el('tbody');
+    list.forEach(function (p) {
+      var cb = el('input', { type: 'checkbox', 'aria-label': 'Sudah diberi ucapan terima kasih: ' + p.nama });
+      cb.checked = !!p.sudah_diucapkan;
+      cb.addEventListener('change', function () {
+        cb.disabled = true;
+        rpc('pantau_tandai', { p_kode: kode, p_install_id: p.install_id, p_sudah: cb.checked })
+          .then(function () { muat(); })
+          .catch(function (e) { cb.checked = !cb.checked; cb.disabled = false; $('dashErr').textContent = 'Gagal menyimpan: ' + e.message; });
+      });
+      var donasi = p.donasi_kali > 0
+        ? el('td', { class: 'num' }, [el('span', { class: 'pill', text: rupiah(p.donasi_total) }), el('span', { text: ' · ' + p.donasi_kali + 'x' })])
+        : el('td', { text: '-' });
+      body.appendChild(el('tr', { class: p.sudah_diucapkan ? 'done' : '' }, [
+        el('td', { text: p.nama }), el('td', null, [kontak(p.kontak)]), donasi,
+        el('td', { class: 'num', text: p.donasi_terakhir ? waktu(p.donasi_terakhir) : '-' }), el('td', null, [cb])
+      ]));
+    });
+    box.appendChild(el('table', null, [el('thead', null, [head]), body]));
+  }
+
+  function render(d) {
+    $('meta').textContent = 'Diperbarui ' + waktu(d.dibuat);
+    var t = $('tiles'); t.textContent = '';
+    t.appendChild(tile(fmt.format(d.pemasang), 'Pemasang', 'aplikasi yang pernah dibuka'));
+    t.appendChild(tile(fmt.format(d.aktif_7_hari), 'Aktif 7 hari', fmt.format(d.aktif_hari_ini) + ' aktif hari ini'));
+    t.appendChild(tile(fmt.format(d.unduh_klik), 'Klik unduh', fmt.format(d.unduh_unik) + ' pengunjung unik'));
+    t.appendChild(tile(fmt.format(Number(d.saweria_promo) + Number(d.saweria_aplikasi)), 'Klik Saweria',
+      fmt.format(d.saweria_promo) + ' dari promo, ' + fmt.format(d.saweria_aplikasi) + ' dari aplikasi'));
+    t.appendChild(tile(fmt.format(d.donasi_dicatat), 'Donasi tercatat', rupiah(d.donasi_total) + ' dicatat orang tua'));
+    chart($('chartPasang'), d.pemasang_harian || [], function (r) { return r.n; }, 'Pemasang baru per hari');
+    chart($('chartUnduh'), d.unduh_harian || [], function (r) { return r.klik; }, 'Klik unduh per hari');
+    breakdown($('rSumber'), d.per_sumber || []);
+    breakdown($('rPlatform'), d.per_platform || []);
+    breakdown($('rVersi'), (d.per_versi || []).map(function (v) { return { nama: 'v' + v.nama, n: v.n }; }));
+    pendukung(d.pendukung || []);
+  }
+
+  function showGate(msg) {
+    $('dash').hidden = true; $('gate').hidden = false; $('gateErr').textContent = msg || '';
+    $('masuk').disabled = false; $('kode').focus();
+  }
+
+  function muat() {
+    $('muat').disabled = true; $('dashErr').textContent = '';
+    return rpc('pantau_ringkasan', { p_kode: kode }).then(function (d) {
+      $('gate').hidden = true; $('dash').hidden = false; render(d);
+    }).catch(function (e) {
+      if (e.wrongCode) { clearKode(); kode = null; showGate('Kode akses salah.'); return; }
+      var msg = e.notDeployed
+        ? 'Fungsi pantau belum dipasang di Supabase. Jalankan backend/supabase/003_pantau.sql.'
+        : 'Gagal memuat: ' + e.message;
+      if ($('dash').hidden) showGate(msg); else $('dashErr').textContent = msg;
+    }).then(function () { $('muat').disabled = false; });
+  }
+
+  $('gate').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    kode = $('kode').value.trim();
+    if (!kode) return;
+    $('masuk').disabled = true; $('gateErr').textContent = '';
+    saveKode(kode, $('ingat').checked);
+    muat();
+  });
+  $('muat').addEventListener('click', muat);
+  $('keluar').addEventListener('click', function () { clearKode(); kode = null; $('kode').value = ''; showGate(''); });
+
+  kode = readKode();
+  if (kode) { $('gate').hidden = true; $('dash').hidden = false; muat(); } else { $('kode').focus(); }
+})();
+</script>
+</body>
+</html>
