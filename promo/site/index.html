@@ -1,0 +1,777 @@
+<title>Qorybook</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Rak buku digital gratis untuk anak Indonesia: 1.421 buku resmi dari pemerintah, Mode Anak yang terkunci, dan kendali penuh untuk orang tua.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;500;600;700;800;900&display=swap">
+<style>
+/* Layout: buku cerita bergambar. Sampul malam berbintang dengan HP 3D dan buku melayang,
+   lalu halaman-halaman fitur bergantian kiri-kanan, pita hangat untuk orang tua,
+   tur layar 3D melingkar, dan penutup tentang sumber buku. */
+:root {
+  /* warna dari tema aplikasi Qorybook */
+  --paper: #FFF8EF;
+  --surface: #FFFFFF;
+  --band: #FFEFDF;
+  --ink: #2B2D42;
+  --ink-soft: #6B6F80;
+  --line: #F0E6DA;
+  --orange: #FF7A45;
+  --orange-deep: #E85D2A;
+  --sun: #FFC93C;
+  --leaf: #4CC38A;
+  --sky: #4DA8FF;
+  --grape: #8E6CEF;
+  --chip: #FFE6D6;
+  --on-orange: #FFFFFF;
+  /* sampul malam: sama di kedua tema */
+  --night: #1B1D33;
+  --night-2: #2B2D52;
+  --night-ink: #F7F1E8;
+  --night-soft: #B9B6CC;
+  --bezel-a: #3A3D58;
+  --bezel-b: #17182A;
+
+  --f-body: "Nunito", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  --f-hand: "Caveat", "Segoe Print", "Comic Sans MS", cursive;
+  --step--1: clamp(0.84rem, 0.8rem + 0.2vw, 0.95rem);
+  --step-0: clamp(1rem, 0.95rem + 0.25vw, 1.12rem);
+  --step-1: clamp(1.2rem, 1.1rem + 0.5vw, 1.45rem);
+  --step-2: clamp(1.6rem, 1.3rem + 1.4vw, 2.4rem);
+  --step-3: clamp(2.3rem, 1.6rem + 3.2vw, 4.3rem);
+  --radius: 22px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #17182A; --surface: #23253B; --band: #202238; --ink: #F5EFE6; --ink-soft: #ABA8BF;
+    --line: #34365A; --orange: #FF8A5B; --orange-deep: #FF9A70; --chip: #3A2C2E; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #17182A; --surface: #23253B; --band: #202238; --ink: #F5EFE6; --ink-soft: #ABA8BF;
+  --line: #34365A; --orange: #FF8A5B; --orange-deep: #FF9A70; --chip: #3A2C2E; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { overflow-x: clip; }
+body {
+  background: var(--paper); color: var(--ink); font-family: var(--f-body);
+  font-size: var(--step-0); line-height: 1.6; -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { font-weight: 900; line-height: 1.08; letter-spacing: -0.02em; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; border-radius: 8px; }
+
+.wrap {
+  max-width: 1140px; margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.eyebrow {
+  font-size: var(--step--1); font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange-deep);
+}
+.hand { font-family: var(--f-hand); font-weight: 700; }
+
+/* ---------- sampul ---------- */
+.hero {
+  position: relative; background:
+    radial-gradient(120% 80% at 75% 40%, #3B2F55 0%, transparent 55%),
+    linear-gradient(180deg, var(--night) 0%, var(--night-2) 100%);
+  color: var(--night-ink); overflow: hidden;
+}
+.hero .wrap { padding-block: clamp(20px, 3vw, 32px) 0; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 1.25rem; letter-spacing: -0.01em; }
+.brand svg { width: 38px; height: 38px; flex: none; }
+.hero-grid {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); align-items: center;
+  gap: clamp(8px, 3vw, 40px); padding-block: clamp(24px, 5vw, 56px) clamp(32px, 5vw, 64px);
+}
+.hero h1 { font-size: var(--step-3); }
+.hero h1 .mark {
+  color: var(--sun); background: linear-gradient(transparent 78%, rgba(255,122,69,.55) 78%, rgba(255,122,69,.55) 94%, transparent 94%);
+}
+.lead { margin-top: 18px; font-size: var(--step-1); line-height: 1.5; color: var(--night-soft); max-width: 34ch; }
+.lead strong { color: var(--night-ink); font-weight: 800; }
+.pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; padding: 0; list-style: none; }
+.pills li {
+  display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); font-weight: 700; font-size: var(--step--1);
+}
+.pills i { width: 9px; height: 9px; border-radius: 50%; display: block; }
+.scene {
+  position: relative; height: clamp(440px, 52vw, 640px); min-width: 0; touch-action: pan-y; cursor: grab;
+}
+.scene:active { cursor: grabbing; }
+.scene canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.scene .fallback {
+  position: absolute; inset: 0; display: grid; place-items: center; transition: opacity .6s ease;
+}
+.scene.gl-ready .fallback { opacity: 0; pointer-events: none; }
+.scene .hint {
+  position: absolute; right: 6%; bottom: 4%; font-size: 1.5rem; color: var(--sun); transform: rotate(-5deg);
+  display: flex; align-items: center; gap: 6px; pointer-events: none;
+}
+.scene .hint svg { width: 46px; height: 30px; }
+
+/* ---------- angka ---------- */
+.facts { border-bottom: 1px solid var(--line); }
+.facts .wrap { padding-block: clamp(28px, 4vw, 44px); }
+.facts dl { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; margin: 0; }
+.facts div { min-width: 0; }
+.facts dt { font-size: var(--step-2); font-weight: 900; color: var(--orange); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.facts dd { margin: 4px 0 0; color: var(--ink-soft); font-weight: 700; font-size: var(--step--1); line-height: 1.35; }
+
+/* ---------- bagian & fitur ---------- */
+.section { padding-block: clamp(56px, 8vw, 104px); overflow-x: clip; }
+.section-head { max-width: 640px; display: grid; gap: 12px; margin-bottom: clamp(36px, 6vw, 72px); }
+.section-head h2 { font-size: var(--step-2); }
+.section-head p { color: var(--ink-soft); font-size: var(--step-1); line-height: 1.5; }
+.band { background: var(--band); }
+
+.spreads { display: grid; gap: clamp(64px, 10vw, 128px); }
+.spread {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(28px, 6vw, 80px);
+}
+.spread.flip .media { order: 2; }
+.copy { display: grid; gap: 14px; min-width: 0; max-width: 520px; }
+.copy h3 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.2rem); }
+.copy p { color: var(--ink-soft); }
+.copy ul { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.copy li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; align-items: start; font-weight: 600; }
+.copy li::before {
+  content: ""; width: 22px; height: 22px; margin-top: 2px; border-radius: 50%;
+  background: var(--chip) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%23FF7A45' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/14px no-repeat;
+}
+.tag {
+  justify-self: start; padding: 4px 12px; border-radius: 999px; font-weight: 800; font-size: var(--step--1);
+  background: var(--chip); color: var(--orange-deep);
+}
+
+/* panggung HP 3D (CSS) */
+.media { min-width: 0; display: grid; justify-items: center; gap: 14px; }
+.stage {
+  --rx: 0; --ry: 0; perspective: 1300px; display: flex; justify-content: center; align-items: center;
+  padding-block: 10px; width: 100%;
+}
+.phone {
+  --w: clamp(176px, 22vw, 250px);
+  width: var(--w); aspect-ratio: 1080 / 2400; flex: none; position: relative;
+  border-radius: calc(var(--w) * 0.14); padding: calc(var(--w) * 0.032);
+  background: linear-gradient(150deg, var(--bezel-a), var(--bezel-b));
+  box-shadow: 0 1px 0 rgba(255,255,255,.12) inset, 0 30px 60px -20px rgba(27,29,51,.45), 0 12px 24px -12px rgba(27,29,51,.35);
+  transform-style: preserve-3d;
+  transform: rotateY(calc(var(--base-ry, -16deg) + var(--ry) * 10deg)) rotateX(calc(var(--base-rx, 5deg) + var(--rx) * -8deg)) rotateZ(var(--base-rz, 0deg));
+  transition: transform .5s cubic-bezier(.2,.7,.2,1);
+  animation: bob 6s ease-in-out infinite;
+}
+.phone img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: calc(var(--w) * 0.11); background: var(--paper); }
+.phone::after { /* kilau kaca */
+  content: ""; position: absolute; inset: calc(var(--w) * 0.032); border-radius: calc(var(--w) * 0.11); pointer-events: none;
+  background: linear-gradient(115deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 32%);
+}
+.flip .phone { --base-ry: 16deg; }
+.phone.second { --w: clamp(150px, 18vw, 208px); margin-left: calc(var(--w) * -0.28); z-index: -1; --base-ry: -26deg; --base-rz: 2deg; animation-delay: -3s; filter: saturate(.95); }
+.flip .phone.second { --base-ry: 26deg; --base-rz: -2deg; }
+.phone.wide { --w: clamp(280px, 40vw, 500px); aspect-ratio: 2400 / 1080; border-radius: calc(var(--w) * 0.07); padding: calc(var(--w) * 0.016); }
+.phone.wide img { border-radius: calc(var(--w) * 0.055); }
+.phone.wide::after { inset: calc(var(--w) * 0.016); border-radius: calc(var(--w) * 0.055); }
+@keyframes bob { 50% { translate: 0 -8px; } }
+
+.note {
+  font-family: var(--f-hand); font-weight: 700; font-size: 1.45rem; line-height: 1.1; color: var(--orange-deep);
+  display: flex; align-items: center; gap: 6px; transform: rotate(-3deg); text-align: center;
+}
+.note svg { width: 34px; height: 26px; flex: none; }
+
+/* Keluarga Literasi */
+.split { display: grid; gap: 14px; padding: 18px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); }
+.split .bar { display: flex; height: 14px; border-radius: 8px; overflow: hidden; }
+.split .bar span:first-child { flex: 80; background: var(--orange); }
+.split .bar span:last-child { flex: 20; background: var(--leaf); }
+.split .row { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; align-items: baseline; }
+.split b { font-size: 1.4rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+.split .ops b { color: var(--orange); }
+.split .edu b { color: var(--leaf); }
+.split .row span { color: var(--ink-soft); font-weight: 600; }
+.cta {
+  justify-self: start; display: inline-flex; align-items: center; gap: 10px; padding: 14px 22px; border-radius: 18px;
+  background: var(--orange); color: var(--on-orange); font-weight: 800; text-decoration: none; border: 0; font: inherit; font-weight: 800;
+}
+.cta[aria-disabled="true"] { opacity: .78; cursor: default; }
+.small { font-size: var(--step--1); color: var(--ink-soft); }
+
+/* ---------- tur layar melingkar ---------- */
+.tour { background: linear-gradient(180deg, var(--night-2), var(--night)); color: var(--night-ink); overflow: hidden; }
+.tour .section-head p { color: var(--night-soft); }
+.tour .eyebrow { color: var(--sun); }
+.ring-wrap {
+  position: relative; height: clamp(360px, 44vw, 470px); perspective: 1500px; perspective-origin: 50% 30%;
+  touch-action: pan-y; cursor: grab; user-select: none;
+}
+.ring-wrap:active { cursor: grabbing; }
+.ring {
+  --spin: 0deg; position: absolute; left: 50%; top: 4%; width: 0; height: 0;
+  transform-style: preserve-3d; transform: translateZ(calc(var(--r) * -1)) rotateX(-6deg) rotateY(var(--spin));
+}
+.ring figure {
+  --w: clamp(120px, 14vw, 160px);
+  position: absolute; left: calc(var(--w) / -2); top: 0; width: var(--w); margin: 0;
+  transform: rotateY(calc(var(--i) * var(--step))) translateZ(var(--r));
+  display: grid; gap: 8px; justify-items: center;
+}
+.ring .phone { --w: inherit; width: 100%; animation: none; transform: none; box-shadow: 0 20px 40px -18px rgba(0,0,0,.6); }
+.ring figcaption { font-weight: 800; font-size: 0.85rem; color: var(--night-soft); text-align: center; line-height: 1.2; }
+.tour .hint { text-align: center; color: var(--sun); font-size: 1.4rem; margin-top: 8px; }
+
+/* ---------- sumber ---------- */
+.source { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 64px); align-items: start; }
+.source .card { padding: clamp(18px, 3vw, 28px); border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); display: grid; gap: 12px; }
+.source .card p { color: var(--ink-soft); }
+.source .stat { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.source .stat div { padding: 16px; border-radius: 18px; background: var(--band); }
+.source .stat b { display: block; font-size: var(--step-2); font-weight: 900; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.source .stat span { font-weight: 700; color: var(--ink-soft); font-size: var(--step--1); }
+
+footer { border-top: 1px solid var(--line); }
+footer .wrap { padding-block: 28px 40px; display: flex; flex-wrap: wrap; gap: 10px 24px; justify-content: space-between; align-items: center; }
+footer p { color: var(--ink-soft); font-size: var(--step--1); max-width: 60ch; }
+
+@media (max-width: 860px) {
+  .hero-grid { grid-template-columns: minmax(0, 1fr); }
+  .scene { height: 460px; margin-inline: -8px; }
+  .facts dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .facts div:first-child { grid-column: 1 / -1; }
+  .spread, .source { grid-template-columns: minmax(0, 1fr); }
+  .spread.flip .media { order: 0; }
+  .copy { max-width: none; }
+}
+@media (max-width: 420px) {
+  .phone { --w: 168px; }
+  .phone.second { --w: 140px; }
+  .phone.wide { --w: min(320px, 86vw); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .phone { animation: none; transition: none; }
+}
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="brand">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="24" r="24" fill="#FF7A45"/>
+        <path d="M10 16c4.5-1.6 9-1.2 14 1.2v17.6c-5-2.4-9.5-2.8-14-1.2z" fill="#FFFFFF"/>
+        <path d="M38 16c-4.5-1.6-9-1.2-14 1.2v17.6c5-2.4 9.5-2.8 14-1.2z" fill="#FFF3E6"/>
+        <path d="M10 33.6c4.5-1.6 9-1.2 14 1.2c5-2.4 9.5-2.8 14-1.2v2c-4.5-1.6-9-1.2-14 1.2c-5-2.4-9.5-2.8-14-1.2z" fill="#C95F33"/>
+        <path d="M24 6.5l2.2 4.6 5 .6-3.7 3.4 1 5-4.5-2.5-4.5 2.5 1-5-3.7-3.4 5-.6z" fill="#FFC93C"/>
+      </svg>
+      Qorybook
+    </div>
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow" style="color: var(--sun)">Aplikasi baca untuk anak · Android</p>
+        <h1 style="margin-top: 14px">Rak buku digital yang <span class="mark">aman</span> untuk anak.</h1>
+        <p class="lead"><strong>1.421 buku cerita resmi dan gratis</strong> dari pemerintah Indonesia, dalam satu aplikasi yang bisa dikunci khusus untuk anak. Orang tua yang pegang kuncinya.</p>
+        <ul class="pills">
+          <li><i style="background: var(--leaf)"></i>Gratis, tanpa iklan</li>
+          <li><i style="background: var(--sky)"></i>PAUD sampai SD kelas 6</li>
+          <li><i style="background: var(--sun)"></i>Buku, komik, audio, video</li>
+        </ul>
+      </div>
+      <div class="scene" id="scene" aria-label="Animasi 3D: HP berisi aplikasi Qorybook dikelilingi buku-buku yang melayang">
+        <div class="fallback">
+          <div class="stage"><div class="phone" style="--w: clamp(190px, 22vw, 240px)"><img src="img/beranda.webp" alt="Beranda Qorybook"></div></div>
+        </div>
+        <canvas id="gl" aria-hidden="true"></canvas>
+        <div class="hint hand">
+          <svg viewBox="0 0 46 30" aria-hidden="true"><path d="M44 6c-10 1-26 4-36 18m0 0l1-9m-1 9l8-3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          geser untuk memutar
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="facts" aria-label="Isi katalog">
+  <div class="wrap">
+    <dl>
+      <div><dt>1.421</dt><dd>buku resmi dari BUDI dan SIBI Kemendikdasmen</dd></div>
+      <div><dt>26</dt><dd>tema, dari Cerita Rakyat sampai Tata Surya</dd></div>
+      <div><dt>202</dt><dd>buku audio untuk didengarkan</dd></div>
+      <div><dt>184</dt><dd>buku video layar penuh</dd></div>
+      <div><dt>Rp 0</dt><dd>tanpa langganan dan tanpa iklan</dd></div>
+    </dl>
+  </div>
+</section>
+
+<main>
+  <section class="section" id="anak">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Untuk anak</p>
+        <h2>Dunia baca yang dibuat untuk tangan kecil</h2>
+        <p>Tombol besar, gambar sampul yang jelas, dan ikon yang mudah dikenali. Anak bisa memilih bacaan sendiri tanpa tersesat ke tempat lain.</p>
+      </div>
+
+      <div class="spreads">
+        <article class="spread">
+          <div class="media">
+            <div class="stage" data-tilt><div class="phone"><img src="img/beranda.webp" alt="Beranda: sapaan untuk Aisyah, Lanjutkan Membaca, Pilih Jenjang, dan buku populer" loading="lazy"></div></div>
+            <p class="note"><svg viewBox="0 0 34 26" aria-hidden="true"><path d="M30 22C24 10 14 6 4 6m0 0l7-4m-7 4l6 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>halaman terakhir tersimpan otomatis</p>
+          </div>
+          <div class="copy">
+            <span class="tag">Beranda</span>
+            <h3>Langsung lanjut dari halaman terakhir</h3>
+            <p>Beranda menyapa anak dengan namanya. Buku yang sedang dibaca muncul paling atas, lengkap dengan halaman terakhirnya, jadi anak tinggal ketuk dan lanjut membaca.</p>
+            <ul>
+              <li>Lanjutkan Membaca dengan bilah kemajuan</li>
+              <li>Pilih jenjang: PAUD/TK, SD kelas 1–3, SD kelas 4–6</li>
+              <li>Buku populer di Indonesia dan yang sering dibaca di rumah</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="spread flip">
+          <div class="media">
+            <div class="stage" data-tilt>
+              <div class="phone"><img src="img/jelajah.webp" alt="Jelajah: jenjang, jenis buku, dan tema" loading="lazy"></div>
+              <div class="phone second"><img src="img/cari.webp" alt="Hasil pencarian kata laut: 16 buku ditemukan" loading="lazy"></div>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag">Jelajah &amp; Cari</span>
+            <h3>Temukan buku lewat tema, jenis, atau satu kata</h3>
+            <p>Anak bisa menjelajah per jenjang, per jenis buku, atau per tema seperti Hewan dan Tumbuhan dan Cerita Rakyat. Pencarian memberi saran kata seperti "laut" dan "kampung", jadi anak yang baru belajar mengetik tetap bisa menemukan bacaan.</p>
+            <ul>
+              <li>Buku bergambar, komik, buku audio, dan buku video</li>
+              <li>26 tema bacaan</li>
+              <li>Saran kata dan pilihan tema di halaman Cari</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="spread">
+          <div class="media">
+            <div class="stage" data-tilt>
+              <div class="phone"><img src="img/pembaca.webp" alt="Pembaca buku: halaman 13 dari 36 buku Si Rancak Sakit" loading="lazy"></div>
+              <div class="phone second"><img src="img/detail.webp" alt="Detail buku Si Rancak Sakit dengan sinopsis dan tombol Baca Sekarang" loading="lazy"></div>
+            </div>
+            <p class="note"><svg viewBox="0 0 34 26" aria-hidden="true"><path d="M30 22C24 10 14 6 4 6m0 0l7-4m-7 4l6 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>ilustrasi asli dari bukunya</p>
+          </div>
+          <div class="copy">
+            <span class="tag">Pembaca</span>
+            <h3>Rasanya seperti memegang buku sungguhan</h3>
+            <p>Halaman tampil penuh dan tajam. Anak cukup menggeser atau mengetuk untuk membalik halaman. Setiap buku punya halaman detail berisi cerita singkat, jenjang, dan jumlah halaman sebelum mulai membaca.</p>
+            <ul>
+              <li>Penanda halaman berwarna, bisa diberi catatan</li>
+              <li>Cahaya hangat yang nyaman untuk membaca malam hari</li>
+              <li>Dua halaman sekaligus saat HP dimiringkan</li>
+              <li>Buku bisa diunduh untuk dibaca tanpa internet</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="spread flip">
+          <div class="media">
+            <div class="stage" data-tilt><div class="phone wide" style="--base-ry: 12deg; --base-rx: 8deg"><img src="img/video.webp" alt="Pemutar buku video layar penuh: Tiga Keranjang Ikan" loading="lazy"></div></div>
+            <p class="note"><svg viewBox="0 0 34 26" aria-hidden="true"><path d="M30 22C24 10 14 6 4 6m0 0l7-4m-7 4l6 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>ikon gembok mengunci layar sentuh</p>
+          </div>
+          <div class="copy">
+            <span class="tag">Audio &amp; Video</span>
+            <h3>Buku yang bisa didengar dan ditonton</h3>
+            <p>Ratusan buku audio dan video diputar layar penuh dengan tombol besar. Mode kunci menahan ketukan tak sengaja, jadi tontonan tidak berhenti saat layar tersentuh tangan kecil.</p>
+            <ul>
+              <li>Mundur dan maju 10 detik</li>
+              <li>Posisi terakhir tersimpan, seperti buku biasa</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="spread">
+          <div class="media">
+            <div class="stage" data-tilt><div class="phone"><img src="img/rak.webp" alt="Rak Bukuku: Favorit, Sedang Dibaca, dan Selesai" loading="lazy"></div></div>
+          </div>
+          <div class="copy">
+            <span class="tag">Rak Bukuku</span>
+            <h3>Rak pribadi untuk setiap anak</h3>
+            <p>Buku favorit, buku yang sedang dibaca, dan buku yang sudah selesai tersusun rapi di rak masing-masing anak. Kakak dan adik punya raknya sendiri.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band" id="orang-tua">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Untuk orang tua</p>
+        <h2>Orang tua yang pegang kuncinya</h2>
+        <p>Qorybook selalu terbuka dalam Mode Anak. Semua pengaturan ada di Area Orang Tua yang terkunci PIN.</p>
+      </div>
+
+      <div class="spreads">
+        <article class="spread flip">
+          <div class="media">
+            <div class="stage" data-tilt>
+              <div class="phone"><img src="img/modeanak.webp" alt="Pengaturan Mode Anak: sematkan layar, senyapkan notifikasi, izinkan telepon penting" loading="lazy"></div>
+              <div class="phone second"><img src="img/sematkan.webp" alt="Dialog Android: App is pinned" loading="lazy"></div>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag">Mode Anak</span>
+            <h3>HP terkunci di dalam Qorybook</h3>
+            <p>Saat Mode Anak aktif, layar disematkan sehingga anak tidak bisa keluar ke aplikasi lain atau kembali ke layar utama. Notifikasi ikut disenyapkan, dan pengaturan Jangan Ganggu milik orang tua dikembalikan seperti semula setelahnya.</p>
+            <ul>
+              <li>Telepon dari kontak berbintang tetap bisa masuk</li>
+              <li>Daftar periksa memastikan semua izin sudah siap</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="spread">
+          <div class="media">
+            <div class="stage" data-tilt><div class="phone"><img src="img/gerbang.webp" alt="Gerbang orang tua: Khusus Orang Tua, masukkan PIN" loading="lazy"></div></div>
+            <p class="note"><svg viewBox="0 0 34 26" aria-hidden="true"><path d="M30 22C24 10 14 6 4 6m0 0l7-4m-7 4l6 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>tekan dan tahan gemboknya dulu</p>
+          </div>
+          <div class="copy">
+            <span class="tag">Gerbang orang tua</span>
+            <h3>Tahan, lalu masukkan PIN</h3>
+            <p>Untuk keluar dari Mode Anak, tombol gembok harus ditekan dan ditahan, lalu PIN orang tua dimasukkan. Bisa juga dengan sidik jari atau kunci layar HP. Setelah beberapa kali salah, gerbang terkunci sementara.</p>
+          </div>
+        </article>
+
+        <article class="spread flip">
+          <div class="media">
+            <div class="stage" data-tilt>
+              <div class="phone"><img src="img/aturan.webp" alt="Ubah profil: jenjang buku, batas waktu harian, jam tidur, hanya buku pilihan orang tua" loading="lazy"></div>
+              <div class="phone second"><img src="img/orangtua.webp" alt="Area Orang Tua dengan profil Aisyah dan Bima" loading="lazy"></div>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag">Profil &amp; aturan</span>
+            <h3>Satu profil, satu set aturan untuk tiap anak</h3>
+            <p>Buat hingga enam profil anak. Setiap profil punya jenjang buku, batas waktu, dan jam tidurnya sendiri. Ringkasan menit membaca hari ini dan jumlah buku yang selesai langsung terlihat.</p>
+            <ul>
+              <li>Batas waktu harian dari 15 sampai 120 menit</li>
+              <li>Jam tidur, misalnya pukul 20.00–06.00</li>
+              <li>Mode "hanya buku pilihan orang tua"</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="spread">
+          <div class="media">
+            <div class="stage" data-tilt>
+              <div class="phone"><img src="img/istirahat.webp" alt="Layar istirahat: Waktu membaca hari ini habis" loading="lazy"></div>
+              <div class="phone second"><img src="img/tambahwaktu.webp" alt="Beri waktu tambahan: 15, 30, atau 60 menit" loading="lazy"></div>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag">Waktu layar</span>
+            <h3>Saat waktunya habis, layar istirahat muncul</h3>
+            <p>Anak mendapat pujian atas menit membacanya dan diajak istirahat. Kalau ada alasan khusus, orang tua bisa memberi tambahan 15, 30, atau 60 menit tanpa mengubah aturan harian.</p>
+          </div>
+        </article>
+
+        <article class="spread flip" id="keluarga-literasi">
+          <div class="media">
+            <div class="stage" data-tilt>
+              <div class="phone"><img src="img/keluarga.webp" alt="Halaman Keluarga Literasi: ke mana donasimu pergi" loading="lazy"></div>
+              <div class="phone second"><img src="img/kontribusi.webp" alt="Daftar kontribusi: Rp 50.000 dari 1 kontribusi" loading="lazy"></div>
+            </div>
+          </div>
+          <div class="copy">
+            <span class="tag">Keluarga Literasi</span>
+            <h3>Gratis untuk semua anak, berkat Keluarga Literasi</h3>
+            <p>Qorybook tidak berbayar dan tanpa iklan. Orang tua yang ingin ikut menjaga aplikasi ini bisa berdonasi lewat Saweria dan menjadi Keluarga Literasi.</p>
+            <div class="split" role="group" aria-label="Pembagian donasi">
+              <div class="bar" aria-hidden="true"><span></span><span></span></div>
+              <div class="row ops"><b>80%</b><span>Operasional Qorybook: perawatan aplikasi, pembaruan katalog buku, dan fitur baru</span></div>
+              <div class="row edu"><b>20%</b><span>Disalurkan untuk pendidikan anak yatim dan dhuafa</span></div>
+            </div>
+            <span class="cta" role="link" aria-disabled="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.6.7-1.4 2.2-2.6 4.3-2.6 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z" fill="currentColor"/></svg>
+              Tautan Saweria segera hadir
+            </span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tour" id="tur">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Tur layar</p>
+        <h2>Semua layar, dalam satu putaran</h2>
+        <p>Tangkapan layar asli dari Qorybook di Android. Geser untuk memutar.</p>
+      </div>
+    </div>
+    <div class="ring-wrap" id="ringWrap">
+      <div class="ring" id="ring">
+        <figure><div class="phone"><img src="img/beranda.webp" alt="" loading="lazy"></div><figcaption>Beranda</figcaption></figure>
+        <figure><div class="phone"><img src="img/beranda2.webp" alt="" loading="lazy"></div><figcaption>Sering dibaca</figcaption></figure>
+        <figure><div class="phone"><img src="img/jelajah.webp" alt="" loading="lazy"></div><figcaption>Jelajah</figcaption></figure>
+        <figure><div class="phone"><img src="img/cari.webp" alt="" loading="lazy"></div><figcaption>Cari</figcaption></figure>
+        <figure><div class="phone"><img src="img/detail.webp" alt="" loading="lazy"></div><figcaption>Detail buku</figcaption></figure>
+        <figure><div class="phone"><img src="img/halaman.webp" alt="" loading="lazy"></div><figcaption>Pembaca</figcaption></figure>
+        <figure><div class="phone"><img src="img/rak.webp" alt="" loading="lazy"></div><figcaption>Rak Bukuku</figcaption></figure>
+        <figure><div class="phone"><img src="img/gerbang.webp" alt="" loading="lazy"></div><figcaption>Gerbang orang tua</figcaption></figure>
+        <figure><div class="phone"><img src="img/orangtua.webp" alt="" loading="lazy"></div><figcaption>Area Orang Tua</figcaption></figure>
+        <figure><div class="phone"><img src="img/aturan.webp" alt="" loading="lazy"></div><figcaption>Aturan profil</figcaption></figure>
+        <figure><div class="phone"><img src="img/istirahat.webp" alt="" loading="lazy"></div><figcaption>Layar istirahat</figcaption></figure>
+        <figure><div class="phone"><img src="img/banner.webp" alt="" loading="lazy"></div><figcaption>Keluarga Literasi</figcaption></figure>
+      </div>
+    </div>
+    <p class="hint hand">geser ke kiri atau kanan</p>
+    <div style="height: clamp(40px, 6vw, 72px)"></div>
+  </section>
+
+  <section class="section" id="sumber">
+    <div class="wrap source">
+      <div class="section-head" style="margin-bottom: 0">
+        <p class="eyebrow">Sumber buku</p>
+        <h2>Buku resmi dan gratis dari pemerintah</h2>
+        <p>Semua buku di Qorybook disediakan gratis oleh pemerintah Indonesia melalui Kementerian Pendidikan Dasar dan Menengah.</p>
+      </div>
+      <div class="card">
+        <div class="stat">
+          <div><b>1.139</b><span>buku dari BUDI, Badan Pengembangan dan Pembinaan Bahasa</span></div>
+          <div><b>282</b><span>buku dari SIBI, Pusat Perbukuan</span></div>
+        </div>
+        <p>Qorybook hanya menjadi perantara. Aplikasi ini memudahkan orang tua memilih dan mengawasi bacaan anak tanpa harus membuka situs aslinya. Qorybook tidak menjual buku dan tidak mengubah isinya.</p>
+        <p class="small">Hak cipta setiap buku tetap milik penulis, ilustrator, dan penerbitnya. Qorybook adalah aplikasi independen dan tidak berafiliasi dengan Kemendikdasmen.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="brand" style="font-size: 1.05rem">Qorybook</div>
+    <p>Tangkapan layar diambil dari aplikasi Qorybook 1.0 di Android, memakai data contoh (profil Aisyah dan Bima). Sampul buku pada animasi 3D berasal dari katalog BUDI Kemendikdasmen.</p>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- kemiringan HP CSS mengikuti kursor ---------- */
+  document.querySelectorAll('[data-tilt]').forEach(function (stage) {
+    if (reduce) return;
+    stage.addEventListener('pointermove', function (e) {
+      if (e.pointerType !== 'mouse') return;
+      var r = stage.getBoundingClientRect();
+      stage.style.setProperty('--ry', ((e.clientX - r.left) / r.width - 0.5).toFixed(3));
+      stage.style.setProperty('--rx', ((e.clientY - r.top) / r.height - 0.5).toFixed(3));
+    });
+    stage.addEventListener('pointerleave', function () {
+      stage.style.setProperty('--ry', 0); stage.style.setProperty('--rx', 0);
+    });
+  });
+
+  /* ---------- tur layar melingkar ---------- */
+  var ring = document.getElementById('ring');
+  var wrap = document.getElementById('ringWrap');
+  var items = ring.querySelectorAll('figure');
+  var n = items.length;
+  items.forEach(function (f, i) { f.style.setProperty('--i', i); });
+  ring.style.setProperty('--step', (360 / n) + 'deg');
+  function layoutRing() {
+    var w = items[0].getBoundingClientRect().width || 140;
+    var r = Math.round((w / 2) / Math.tan(Math.PI / n) + w * 0.28);
+    ring.style.setProperty('--r', r + 'px');
+  }
+  layoutRing();
+  addEventListener('resize', layoutRing);
+  var spin = 0, vel = reduce ? 0 : 0.06, dragging = false, lastX = 0, ringVisible = false;
+  wrap.addEventListener('pointerdown', function (e) { dragging = true; lastX = e.clientX; wrap.setPointerCapture(e.pointerId); });
+  wrap.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    var dx = e.clientX - lastX; lastX = e.clientX;
+    spin += dx * 0.25; vel = dx * 0.25;
+    ring.style.setProperty('--spin', spin + 'deg');
+  });
+  function endDrag() { dragging = false; }
+  wrap.addEventListener('pointerup', endDrag);
+  wrap.addEventListener('pointercancel', endDrag);
+  function tickRing() {
+    if (!dragging) {
+      var base = reduce ? 0 : 0.06;
+      vel += (base * Math.sign(vel || 1) - vel) * 0.03;
+      spin += vel;
+      ring.style.setProperty('--spin', spin + 'deg');
+    }
+    if (ringVisible) requestAnimationFrame(tickRing);
+  }
+  new IntersectionObserver(function (es) {
+    var v = es[0].isIntersecting;
+    if (v && !ringVisible) { ringVisible = true; requestAnimationFrame(tickRing); }
+    ringVisible = v;
+  }).observe(wrap);
+
+  /* ---------- sampul 3D: HP + buku melayang ---------- */
+  var scene3 = document.getElementById('scene');
+  var canvas = document.getElementById('gl');
+  if (!window.THREE) return;
+  var renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+  } catch (err) { return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+  scene.add(new THREE.HemisphereLight(0xfff1df, 0x1b1d33, 0.95));
+  var key = new THREE.DirectionalLight(0xffffff, 0.85); key.position.set(3, 4, 6); scene.add(key);
+  var warm = new THREE.PointLight(0xff7a45, 1.4, 12); warm.position.set(-2.5, -1, 2); scene.add(warm);
+
+  var loader = new THREE.TextureLoader();
+  function tex(url, cb) {
+    var t = loader.load(url, function () { if (cb) cb(t); needsFrame = true; });
+    t.encoding = THREE.sRGBEncoding;
+    t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    return t;
+  }
+
+  function rounded(w, h, r) {
+    var s = new THREE.Shape(), x = -w / 2, y = -h / 2;
+    s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+    s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+    s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+    return s;
+  }
+  function normalizeUV(geo, w, h) {
+    var pos = geo.attributes.position, uv = geo.attributes.uv;
+    for (var i = 0; i < uv.count; i++) uv.setXY(i, pos.getX(i) / w + 0.5, pos.getY(i) / h + 0.5);
+    uv.needsUpdate = true;
+  }
+
+  // HP
+  var phone = new THREE.Group();
+  var bodyGeo = new THREE.ExtrudeGeometry(rounded(1.08, 2.32, 0.17), {
+    depth: 0.1, bevelEnabled: true, bevelThickness: 0.035, bevelSize: 0.035, bevelSegments: 5, curveSegments: 16
+  });
+  bodyGeo.translate(0, 0, -0.135);
+  phone.add(new THREE.Mesh(bodyGeo, new THREE.MeshStandardMaterial({ color: 0x2b2d42, roughness: 0.32, metalness: 0.55 })));
+  var SW = 0.98, SH = SW * 2400 / 1080;
+  var screenGeo = new THREE.ShapeGeometry(rounded(SW, SH, 0.12), 16);
+  normalizeUV(screenGeo, SW, SH);
+  var shots = ['beranda', 'pembaca', 'jelajah', 'rak', 'orangtua', 'keluarga'].map(function (k) { return tex('img/' + k + '.webp'); });
+  var matA = new THREE.MeshBasicMaterial({ map: shots[0] });
+  var matB = new THREE.MeshBasicMaterial({ map: shots[1], transparent: true, opacity: 0 });
+  var scrA = new THREE.Mesh(screenGeo, matA); scrA.position.z = 0.003;
+  var scrB = new THREE.Mesh(screenGeo, matB); scrB.position.z = 0.006;
+  phone.add(scrA, scrB);
+  var glare = new THREE.Mesh(screenGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.06 }));
+  glare.position.z = 0.009; phone.add(glare);
+  phone.scale.setScalar(1.22);
+  scene.add(phone);
+
+  // buku melayang dengan sampul asli
+  var covers = ['rancak', 'putrigema', 'dengarlaut', 'dung', 'garagara', 'arun', 'ela', 'rajaampat', 'fokus', 'bawahlaut', 'matalawa'];
+  var pageMat = new THREE.MeshStandardMaterial({ color: 0xf7efe2, roughness: 0.9 });
+  var bookGeo = new THREE.BoxGeometry(0.6, 0.8, 0.085);
+  var books = covers.map(function (name, i) {
+    var spine = new THREE.MeshStandardMaterial({ color: 0xff7a45, roughness: 0.6 });
+    var front = new THREE.MeshStandardMaterial({ roughness: 0.55, map: tex('cover/' + name + '.webp', function (t) {
+      // warna punggung dan sampul belakang mengikuti sampul
+      try {
+        var c = document.createElement('canvas'); c.width = c.height = 1;
+        var g = c.getContext('2d'); g.drawImage(t.image, 0, 0, 1, 1);
+        var d = g.getImageData(0, 0, 1, 1).data;
+        spine.color.setRGB(d[0] / 255, d[1] / 255, d[2] / 255).convertSRGBToLinear();
+      } catch (e) {}
+    }) });
+    var m = new THREE.Mesh(bookGeo, [pageMat, spine, pageMat, pageMat, front, spine]);
+    var g = new THREE.Group(); g.add(m);
+    g.userData = {
+      a: (i / covers.length) * Math.PI * 2,
+      y: ((i * 0.618) % 1) * 2.4 - 1.2,
+      s: 0.82 + ((i * 0.37) % 1) * 0.36,
+      p: i * 1.7
+    };
+    g.scale.setScalar(g.userData.s);
+    scene.add(g);
+    return g;
+  });
+
+  // bintang
+  var starGeo = new THREE.BufferGeometry(), sp = [];
+  for (var i = 0; i < 260; i++) sp.push((Math.random() - 0.5) * 22, (Math.random() - 0.5) * 12, -6 - Math.random() * 8);
+  starGeo.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3));
+  var stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffe2a8, size: 0.05, transparent: true, opacity: 0.8 }));
+  scene.add(stars);
+
+  var W = 0, H = 0, ringR = 2.2;
+  function resize() {
+    W = scene3.clientWidth; H = scene3.clientHeight;
+    renderer.setSize(W, H, false);
+    camera.aspect = W / H;
+    ringR = camera.aspect < 0.95 ? 1.95 : 2.4;
+    // mundurkan kamera secukupnya agar lingkaran buku muat di lebar layar
+    var fit = (ringR + 0.4) / (Math.tan(THREE.MathUtils.degToRad(15)) * camera.aspect) * 0.82;
+    camera.position.set(0, 0.15, Math.max(8.4, fit));
+    camera.updateProjectionMatrix();
+    needsFrame = true;
+  }
+
+  var spinTarget = 0, spinNow = 0, px = 0, py = 0, down = false, lastX = 0;
+  scene3.addEventListener('pointerdown', function (e) { down = true; lastX = e.clientX; });
+  addEventListener('pointerup', function () { down = false; });
+  scene3.addEventListener('pointermove', function (e) {
+    var r = scene3.getBoundingClientRect();
+    px = (e.clientX - r.left) / r.width - 0.5; py = (e.clientY - r.top) / r.height - 0.5;
+    if (down) { spinTarget += (e.clientX - lastX) * 0.008; lastX = e.clientX; needsFrame = true; }
+  });
+  scene3.addEventListener('pointerleave', function () { px = py = 0; down = false; });
+
+  var clock = new THREE.Clock(), t = 0, shot = 0, fade = -1, nextSwap = 3.2, needsFrame = true, visible = true;
+  function frame() {
+    var dt = Math.min(clock.getDelta(), 0.05);
+    if (!reduce) t += dt;
+    spinNow += (spinTarget - spinNow) * 0.08;
+
+    phone.rotation.y = -0.32 + Math.sin(t * 0.45) * 0.22 + spinNow * 0.6 + px * 0.35;
+    phone.rotation.x = 0.06 + py * 0.2 + Math.sin(t * 0.6) * 0.03;
+    phone.position.y = Math.sin(t * 0.9) * 0.06;
+
+    books.forEach(function (b) {
+      var u = b.userData, a = u.a + t * 0.16 + spinNow;
+      b.position.set(Math.cos(a) * ringR, u.y + Math.sin(t * 0.8 + u.p) * 0.1, Math.sin(a) * ringR * 0.75 - 0.3);
+      b.rotation.y = Math.sin(t * 0.5 + u.p) * 0.45 - b.position.x * 0.12;
+      b.rotation.x = Math.sin(t * 0.4 + u.p) * 0.12;
+      b.rotation.z = Math.sin(t * 0.3 + u.p) * 0.15;
+    });
+    stars.material.opacity = 0.65 + Math.sin(t * 1.3) * 0.15;
+
+    // ganti layar HP dengan transisi lembut
+    if (!reduce) {
+      if (fade < 0 && t > nextSwap) { fade = 0; matB.map = shots[(shot + 1) % shots.length]; }
+      if (fade >= 0) {
+        fade += dt / 0.7; matB.opacity = Math.min(fade, 1);
+        if (fade >= 1) {
+          shot = (shot + 1) % shots.length; matA.map = shots[shot]; matB.opacity = 0; fade = -1; nextSwap = t + 3.2;
+        }
+      }
+    }
+
+    renderer.render(scene, camera);
+    if (!scene3.classList.contains('gl-ready')) scene3.classList.add('gl-ready');
+    needsFrame = false;
+  }
+  function loop() {
+    if (visible && (!reduce || needsFrame || Math.abs(spinTarget - spinNow) > 0.001)) frame();
+    requestAnimationFrame(loop);
+  }
+  resize();
+  addEventListener('resize', resize);
+  new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }).observe(scene3);
+  requestAnimationFrame(loop);
+})();
+</script>
