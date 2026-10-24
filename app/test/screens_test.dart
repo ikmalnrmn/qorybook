@@ -448,16 +448,16 @@ void main() {
       expect(find.text('Belum ada kontribusi tercatat'), findsOneWidget);
       await _shot(tester, '${device.name}_18_keluarga_literasi');
 
-      // Tautan Saweria belum diisi di build tes.
+      // Saweria dibuka di browser; saat kembali ke aplikasi, orang tua diajak mencatat donasinya.
       await tester.ensureVisible(find.text('Donasi lewat Saweria'));
       await tester.tap(find.text('Donasi lewat Saweria'));
       await tester.pump();
-      expect(find.textContaining('segera hadir'), findsOneWidget);
-      await tester.pump(const Duration(seconds: 5));
+      expect(app.kiosk.calls, contains('open:https://saweria.co/qorybook'));
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       await tester.pumpAndSettle();
-
-      await tester.ensureVisible(find.text('Catat donasi'));
-      await tester.tap(find.text('Catat donasi'));
+      expect(find.textContaining('Sudah berdonasi?'), findsOneWidget);
+      await tester.tap(find.widgetWithText(SnackBarAction, 'Catat'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Rp 50.000'));
       await tester.pump();

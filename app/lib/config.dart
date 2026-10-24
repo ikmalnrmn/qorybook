@@ -12,10 +12,10 @@ class AppConfig {
 
   static const userAgent = 'Qorybook/1.0 (Android; aplikasi baca anak)';
 
-  /// Halaman Saweria untuk donasi Keluarga Literasi. Bisa juga diisi saat build:
+  /// Halaman Saweria untuk donasi Keluarga Literasi. Bisa diganti saat build:
   ///   `--dart-define=DONATION_URL=https://saweria.co/AKUN`
-  /// Jika kosong, tombol donasi memberi tahu bahwa tautannya segera hadir.
-  static const donationUrl = String.fromEnvironment('DONATION_URL');
+  /// Jika dikosongkan, tombol donasi memberi tahu bahwa tautannya segera hadir.
+  static const donationUrl = String.fromEnvironment('DONATION_URL', defaultValue: 'https://saweria.co/qorybook');
 
   /// Bagian donasi yang disalurkan untuk pendidikan anak yatim dan dhuafa.
   static const donationCharityPercent = 20;
