@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../state/app_state.dart';
 import '../theme.dart';
+import '../widgets/developer.dart';
 import '../widgets/disclaimer.dart';
 
 /// Tentang aplikasi, sumber buku, dan pengelolaan penyimpanan.
@@ -135,6 +136,10 @@ class _AboutScreenState extends State<AboutScreen> {
             icon: const Icon(Icons.cleaning_services_rounded),
             label: const Text('Bersihkan simpanan sementara'),
           ),
+          const SizedBox(height: 24),
+          Text('Developer', style: text.titleMedium),
+          const SizedBox(height: 8),
+          const DeveloperCard(),
         ],
       ),
     );

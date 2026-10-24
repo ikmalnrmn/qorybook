@@ -233,6 +233,26 @@ a { color: inherit; }
 .source .stat b { display: block; font-size: var(--step-2); font-weight: 900; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1.1; }
 .source .stat span { font-weight: 700; color: var(--ink-soft); font-size: var(--step--1); }
 
+/* ---------- developer ---------- */
+.dev { display: grid; gap: clamp(24px, 4vw, 40px); }
+.services { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.services li { display: grid; gap: 6px; align-content: start; padding: 18px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); }
+.services b { font-size: var(--step-1); font-weight: 900; }
+.services span { color: var(--ink-soft); }
+.contacts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.contact { display: grid; gap: 6px; padding: 18px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); min-width: 0; }
+.contact .label { font-weight: 800; font-size: var(--step--1); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+.contact .value { font-size: var(--step-1); font-weight: 900; user-select: all; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.contact .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.contact .cta { padding: 11px 18px; border-radius: 14px; }
+.cta.wa { background: var(--leaf); color: var(--on-orange); }
+.cta.mail { background: var(--sky); color: var(--on-orange); }
+.copy {
+  font: inherit; font-weight: 800; padding: 10px 16px; border-radius: 14px; cursor: pointer;
+  background: transparent; color: var(--ink); border: 1.5px solid var(--line);
+}
+.copy[data-done] { border-color: var(--leaf); color: var(--leaf); }
+
 footer { border-top: 1px solid var(--line); }
 footer .wrap { padding-block: 28px 40px; display: flex; flex-wrap: wrap; gap: 10px 24px; justify-content: space-between; align-items: center; }
 footer p { color: var(--ink-soft); font-size: var(--step--1); max-width: 60ch; }
@@ -242,7 +262,7 @@ footer p { color: var(--ink-soft); font-size: var(--step--1); max-width: 60ch; }
   .scene { height: 460px; margin-inline: -8px; }
   .facts dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .facts div:first-child { grid-column: 1 / -1; }
-  .spread, .source { grid-template-columns: minmax(0, 1fr); }
+  .spread, .source, .services, .contacts { grid-template-columns: minmax(0, 1fr); }
   .spread.flip .media { order: 0; }
   .copy { max-width: none; }
 }
@@ -546,12 +566,45 @@ footer p { color: var(--ink-soft); font-size: var(--step--1); max-width: 60ch; }
       </div>
     </div>
   </section>
+
+  <section class="section band" id="developer">
+    <div class="wrap dev">
+      <div class="section-head" style="margin-bottom: 0">
+        <p class="eyebrow">Developer</p>
+        <h2>Dikembangkan oleh Tim Qorybook</h2>
+        <p>Tim Qorybook adalah pengembang aplikasi Android dan web. Kami terbuka untuk kerja sama, kritik dan saran, serta pembuatan aplikasi sesuai kebutuhan Anda.</p>
+      </div>
+      <ul class="services">
+        <li><b>Kerja sama</b><span>Untuk sekolah, komunitas literasi, atau lembaga yang ingin bermitra menghadirkan bacaan bagi anak.</span></li>
+        <li><b>Kritik dan saran</b><span>Setiap masukan membantu Qorybook menjadi lebih nyaman bagi anak dan orang tua.</span></li>
+        <li><b>Pembuatan aplikasi</b><span>Punya ide aplikasi untuk usaha, sekolah, atau komunitas? Ceritakan kebutuhan Anda.</span></li>
+      </ul>
+      <div class="contacts">
+        <div class="contact">
+          <span class="label">WhatsApp</span>
+          <span class="value" id="waText">0856-0491-3244</span>
+          <div class="actions">
+            <a class="cta wa" href="https://wa.me/6285604913244?text=Halo%20Tim%20Qorybook%2C%20" target="_blank" rel="noopener">Kirim pesan WhatsApp</a>
+            <button class="copy" type="button" data-copy="085604913244" data-target="waText">Salin nomor</button>
+          </div>
+        </div>
+        <div class="contact">
+          <span class="label">Email</span>
+          <span class="value" id="mailText">ikmalnrmn22@gmail.com</span>
+          <div class="actions">
+            <a class="cta mail" href="mailto:ikmalnrmn22@gmail.com?subject=Qorybook">Kirim email</a>
+            <button class="copy" type="button" data-copy="ikmalnrmn22@gmail.com" data-target="mailText">Salin email</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer>
   <div class="wrap">
     <div class="brand" style="font-size: 1.05rem">Qorybook</div>
-    <p>Tangkapan layar diambil dari aplikasi Qorybook 1.0 di Android, memakai data contoh (profil Aisyah dan Bima). Sampul buku pada animasi 3D berasal dari katalog BUDI Kemendikdasmen.</p>
+    <p>Dikembangkan oleh Tim Qorybook. Tangkapan layar diambil dari aplikasi Qorybook 1.0 di Android, memakai data contoh (profil Aisyah dan Bima). Sampul buku pada animasi 3D berasal dari katalog BUDI Kemendikdasmen.</p>
   </div>
 </footer>
 
@@ -571,6 +624,26 @@ footer p { color: var(--ink-soft); font-size: var(--step--1); max-width: 60ch; }
     });
     stage.addEventListener('pointerleave', function () {
       stage.style.setProperty('--ry', 0); stage.style.setProperty('--rx', 0);
+    });
+  });
+
+  /* ---------- tombol salin kontak ---------- */
+  document.querySelectorAll('.copy').forEach(function (btn) {
+    var label = btn.textContent;
+    btn.addEventListener('click', function () {
+      function done() {
+        btn.textContent = 'Tersalin'; btn.setAttribute('data-done', '');
+        setTimeout(function () { btn.textContent = label; btn.removeAttribute('data-done'); }, 1800);
+      }
+      function selectText() {
+        var el = document.getElementById(btn.getAttribute('data-target'));
+        var range = document.createRange(); range.selectNodeContents(el);
+        var sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+        btn.textContent = 'Teks sudah dipilih, salin manual';
+      }
+      try {
+        navigator.clipboard.writeText(btn.getAttribute('data-copy')).then(done, selectText);
+      } catch (e) { selectText(); }
     });
   });
 

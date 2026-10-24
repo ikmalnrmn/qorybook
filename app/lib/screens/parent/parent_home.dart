@@ -8,6 +8,7 @@ import '../../state/app_state.dart';
 import '../../state/kid_mode.dart';
 import '../../state/screen_time.dart';
 import '../../theme.dart';
+import '../../widgets/developer.dart';
 import '../../widgets/donation.dart';
 import '../../widgets/kid_mode_checklist.dart';
 import '../about_screen.dart';
@@ -148,6 +149,10 @@ class ParentHome extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 28),
+                  Text('Developer & kerja sama', style: text.titleLarge),
+                  const SizedBox(height: 6),
+                  const DeveloperCard(),
                 ],
               ),
             ),

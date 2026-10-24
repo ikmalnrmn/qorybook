@@ -18,6 +18,7 @@ import 'package:qorybook/state/kid_mode.dart';
 import 'package:qorybook/state/screen_time.dart';
 import 'package:qorybook/widgets/book_cover.dart';
 import 'package:qorybook/widgets/disclaimer.dart';
+import 'package:qorybook/widgets/developer.dart';
 import 'package:qorybook/widgets/donation.dart';
 import 'package:qorybook/widgets/hold_button.dart';
 import 'package:qorybook/widgets/pin_pad.dart';
@@ -476,6 +477,19 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Terima kasih, Keluarga Literasi!'), findsOneWidget);
       expect(find.text('1 kontribusi · Rp 50.000'), findsOneWidget);
+
+      // Kontak developer di bagian bawah Area Orang Tua.
+      final whatsapp = find.widgetWithText(InkWell, 'WhatsApp');
+      await tester.scrollUntilVisible(whatsapp, 400, scrollable: find.byType(Scrollable).first);
+      await tester.pumpAndSettle();
+      expect(find.text(Developer.name), findsOneWidget);
+      await _shot(tester, '${device.name}_20_developer');
+      await tester.tap(whatsapp);
+      await tester.pump();
+      await tester.ensureVisible(find.widgetWithText(InkWell, 'Email'));
+      await tester.tap(find.widgetWithText(InkWell, 'Email'));
+      await tester.pump();
+      expect(app.kiosk.calls, containsAll([Developer.whatsappUrl, Developer.emailUrl].map((u) => 'open:$u')));
       await _teardown(tester, app);
     });
   }
