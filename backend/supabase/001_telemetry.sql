@@ -1,6 +1,7 @@
 -- Qorybook: penghitung pengguna anonim + perkenalan orang tua (opt-in).
--- BELUM DITERAPKAN. Jalankan di proyek Supabase milikmu (SQL Editor), lalu isi
--- TELEMETRY_URL dan TELEMETRY_KEY (anon key) saat build aplikasi.
+-- Sudah diterapkan 2026-10-25 di proyek fiehwzkuqkslmyzexzgx (diuji lewat REST dengan
+-- kunci publishable). Untuk proyek lain: jalankan di SQL Editor, lalu isi TELEMETRY_URL
+-- dan TELEMETRY_KEY (publishable/anon key) saat build aplikasi.
 --
 -- Prinsip: kunci anon hanya boleh memanggil 4 fungsi di bawah. Tidak ada akses
 -- baca/tulis langsung ke tabel, jadi data tidak bisa dibaca orang lain.
